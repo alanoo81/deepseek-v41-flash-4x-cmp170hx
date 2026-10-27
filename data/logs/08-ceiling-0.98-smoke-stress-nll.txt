@@ -1,0 +1,15 @@
+ready: http://127.0.0.1:8011/v1 (model deepseek-v4.1-flash)
+(Worker_TP0 pid=194) INFO 10-26 20:52:50 [gpu_worker.py:652] Available KV cache memory: 5.76 GiB
+(EngineCore pid=149) INFO 10-26 20:52:50 [kv_cache_utils.py:2325] GPU KV cache size: 2,717,420 tokens, Maximum concurrency for 262,144 tokens per request: 10.37
+chat : No — 221 = 13 × 17, so it is composite.
+tool : {'name': 'get_weather', 'arguments': '{"city": "Lisbon"}'}
+image: Red
+SMOKE PASS
+vague 1 : 8/8 réponses OK, 800134 jetons de prompt, 1937 générés, 388 s
+serveur vivant après le test : True ; VRAM max par carte (MiB) : {0: 63580, 1: 63574, 2: 63566, 3: 63556}
+saved runs/k3-098.json
+code    64   2.9846   2.9846   +0.000  [  +0.000,  +0.000]   +0.00000  0.00000      0/0        1      nan  0.000  +0.000
+0
+pic VRAM à 0,98 (MiB) : {'0': 64540, '1': 64534, '2': 64546, '3': 64676} — utilisable 64911
+
+[exited with code 0]

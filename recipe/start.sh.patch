@@ -1,0 +1,11 @@
+--- a/start.sh  (GNmac-lab/deepseek-v41-flash-1017-cmp170hx @ 2ad5741ab1)
++++ b/start.sh  (this repo)
+@@ -10,6 +10,8 @@
+ case "${1:-start}" in
+   start|restart)
+     docker image inspect "${IMAGE:-ds41-cmp170hx:latest}" > /dev/null 2>&1 || docker/build.sh
++    # dsv41-4x: Engram tables in a tmpfs in RAM when ENGRAM_HOST_DIR points there (a tmpfs does not survive a reboot)
++    case "${ENGRAM_HOST_DIR:-}" in /opt/engram-ram/*) ./engram-ram.sh ;; esac
+     ./serve.sh
+     echo "waiting for the engine (first start compiles kernels: ~6-10 min)..."
+     for _ in $(seq 1 180); do

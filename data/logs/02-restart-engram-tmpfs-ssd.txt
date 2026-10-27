@@ -1,0 +1,22 @@
+waiting for the engine (first start compiles kernels: ~6-10 min)...
+ready: http://127.0.0.1:8011/v1 (model deepseek-v4.1-flash)
+(Worker_TP3 pid=197) WARNING 10-26 17:57:30 [rocm.py:42] Failed to import from amdsmi with ModuleNotFoundError("No module named 'amdsmi'")
+(Worker_TP3 pid=197) WARNING 10-26 17:57:30 [rocm.py:47] Failed to import from vllm._C with ModuleNotFoundError("No module named 'vllm._C'")
+(Worker_TP3 pid=197) WARNING 10-26 17:57:30 [rocm.py:58] Failed to import from vllm._rocm_C with ModuleNotFoundError("No module named 'vllm._rocm_C'")
+(Worker_TP2 pid=196) WARNING 10-26 17:57:30 [rocm.py:42] Failed to import from amdsmi with ModuleNotFoundError("No module named 'amdsmi'")
+(Worker_TP2 pid=196) WARNING 10-26 17:57:30 [rocm.py:47] Failed to import from vllm._C with ModuleNotFoundError("No module named 'vllm._C'")
+(Worker_TP2 pid=196) WARNING 10-26 17:57:30 [rocm.py:58] Failed to import from vllm._rocm_C with ModuleNotFoundError("No module named 'vllm._rocm_C'")
+(Worker_TP0 pid=194) WARNING 10-26 17:57:30 [rocm.py:42] Failed to import from amdsmi with ModuleNotFoundError("No module named 'amdsmi'")
+(Worker_TP0 pid=194) WARNING 10-26 17:57:30 [rocm.py:47] Failed to import from vllm._C with ModuleNotFoundError("No module named 'vllm._C'")
+(Worker_TP0 pid=194) WARNING 10-26 17:57:30 [rocm.py:58] Failed to import from vllm._rocm_C with ModuleNotFoundError("No module named 'vllm._rocm_C'")
+(Worker_TP1 pid=195) WARNING 10-26 17:57:30 [rocm.py:42] Failed to import from amdsmi with ModuleNotFoundError("No module named 'amdsmi'")
+(Worker_TP1 pid=195) WARNING 10-26 17:57:30 [rocm.py:47] Failed to import from vllm._C with ModuleNotFoundError("No module named 'vllm._C'")
+(Worker_TP1 pid=195) WARNING 10-26 17:57:30 [rocm.py:58] Failed to import from vllm._rocm_C with ModuleNotFoundError("No module named 'vllm._rocm_C'")
+(Worker_TP1 pid=195) INFO 10-26 17:57:40 [engram.py:444] Built engram token map (129280 -> 99092 ids) for layers (1, 14)
+(Worker_TP2 pid=196) INFO 10-26 17:57:40 [engram.py:444] Built engram token map (129280 -> 99092 ids) for layers (1, 14)
+(Worker_TP0 pid=194) INFO 10-26 17:57:40 [engram.py:444] Built engram token map (129280 -> 99092 ids) for layers (1, 14)
+(Worker_TP3 pid=197) INFO 10-26 17:57:40 [engram.py:444] Built engram token map (129280 -> 99092 ids) for layers (1, 14)
+               total        used        free      shared  buff/cache   available
+Mem:             460         202          55         189         392         257
+
+[exited with code 0]

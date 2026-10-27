@@ -1,0 +1,7 @@
+vague 1 : 8/8 réponses OK, 800134 jetons de prompt, 1836 générés, 391 s
+vague 2 : 8/8 réponses OK, 800136 jetons de prompt, 1631 générés, 390 s
+serveur vivant après le test : True ; VRAM max par carte (MiB) : {0: 63652, 1: 63808, 2: 63798, 3: 63768}
+0
+pic VRAM global depuis le démarrage DSpark (MiB) : {'0': 63652, '1': 63808, '2': 63798, '3': 63768} — utilisable 64911 MiB/carte
+
+[exited with code 0]

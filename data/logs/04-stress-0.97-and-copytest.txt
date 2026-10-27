@@ -1,0 +1,9 @@
+vague 1 : 8/8 réponses OK, 800134 jetons de prompt, 1841 générés, 392 s
+vague 2 : 8/8 réponses OK, 800136 jetons de prompt, 1781 générés, 389 s
+serveur vivant après le test : True ; VRAM max par carte (MiB) : {0: 62900, 1: 62896, 2: 62926, 3: 62876}
+passe 1 (à froid) : 20/20 copies exactes, 0 lignes fausses, cache 0/13921 jetons de prompt (0 %), 38 s
+passe 2 (même prompt, cache de préfixes) : 20/20 copies exactes, 0 lignes fausses, cache 12800/13921 jetons de prompt (92 %), 34 s
+passe 3 (2e tour sur préfixe en cache) : 20/20 copies exactes, 0 lignes fausses, cache 12800/40985 jetons de prompt (31 %), 44 s
+0
+
+[exited with code 1]

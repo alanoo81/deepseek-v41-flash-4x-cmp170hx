@@ -1,0 +1,457 @@
+[bench] warmup (32 tokens)
+{"tok_s": 95.14299608649073, "ttft_s": 0.3964835070000845, "completion_tokens": 32}
+[bench] run 1/5 phase=base-18-22q3-nospec-engramRAM-structured-c1 conc=1
+{"tok_s": 105.4866427225012, "ttft_s": 0.11760863099880225, "completion_tokens": 400, "aggregate_tok_s": null, "finish_reason": "stop", "nan": false, "accept_ratio": null, "accepted_per_step": null, "mean_draft_tokens_per_step": null, "pos": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}
+[bench] run 2/5 phase=base-18-22q3-nospec-engramRAM-structured-c1 conc=1
+{"tok_s": 105.48227729655372, "ttft_s": 0.1386822669992398, "completion_tokens": 400, "aggregate_tok_s": null, "finish_reason": "stop", "nan": false, "accept_ratio": null, "accepted_per_step": null, "mean_draft_tokens_per_step": null, "pos": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}
+[bench] run 3/5 phase=base-18-22q3-nospec-engramRAM-structured-c1 conc=1
+{"tok_s": 105.54226010666045, "ttft_s": 0.10146593900026346, "completion_tokens": 400, "aggregate_tok_s": null, "finish_reason": "stop", "nan": false, "accept_ratio": null, "accepted_per_step": null, "mean_draft_tokens_per_step": null, "pos": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}
+[bench] run 4/5 phase=base-18-22q3-nospec-engramRAM-structured-c1 conc=1
+{"tok_s": 105.49532475812785, "ttft_s": 0.09916855200026475, "completion_tokens": 400, "aggregate_tok_s": null, "finish_reason": "stop", "nan": false, "accept_ratio": null, "accepted_per_step": null, "mean_draft_tokens_per_step": null, "pos": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}
+[bench] run 5/5 phase=base-18-22q3-nospec-engramRAM-structured-c1 conc=1
+{"tok_s": 105.51629057115579, "ttft_s": 0.09956405900084064, "completion_tokens": 400, "aggregate_tok_s": null, "finish_reason": "stop", "nan": false, "accept_ratio": null, "accepted_per_step": null, "mean_draft_tokens_per_step": null, "pos": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}
+{
+  "phase": "base-18-22q3-nospec-engramRAM-structured-c1",
+  "health_code": 200,
+  "health_body": "",
+  "ts": 1793035785.0733938,
+  "prompt": "structured-count-1-200",
+  "thinking": false,
+  "temperature": 0,
+  "concurrency": 1,
+  "note": "decode_ms_per_draft_step is a serving-cycle ratio, not a kernel timing",
+  "warmup": {
+    "tok_s": 95.14299608649073,
+    "ttft_s": 0.3964835070000845,
+    "completion_tokens": 32
+  },
+  "tok_s_median": 105.49532475812785,
+  "tok_s_min": 105.48227729655372,
+  "tok_s_max": 105.54226010666045,
+  "ttft_median_s": 0.10146593900026346,
+  "completion_tokens_median": 400.0,
+  "accept_ratio_median": null,
+  "accepted_per_step_median": null,
+  "mean_draft_tokens_per_step_median": null,
+  "aggregate_tok_s_median": null,
+  "decode_ms_per_draft_step_median": null,
+  "any_nan": false,
+  "health_code_after": 200
+}
+wrote /opt/dsv41-gnmac/bench/out/base-18-22q3-nospec-engramRAM-structured-c1.json
+[bench] warmup (32 tokens)
+{"tok_s": 105.45461477657169, "ttft_s": 0.09986252700036857, "completion_tokens": 32}
+[bench] run 1/3 phase=base-18-22q3-nospec-engramRAM-structured-c2 conc=2
+{"tok_s": 91.5393059455962, "ttft_s": 0.16617097800008196, "completion_tokens": 800, "aggregate_tok_s": 176.36309866139868, "finish_reason": ["stop", "stop"], "nan": false, "accept_ratio": null, "accepted_per_step": null, "mean_draft_tokens_per_step": null, "pos": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}
+[bench] run 2/3 phase=base-18-22q3-nospec-engramRAM-structured-c2 conc=2
+{"tok_s": 91.74820860420472, "ttft_s": 0.15295273449919478, "completion_tokens": 800, "aggregate_tok_s": 177.29956523279697, "finish_reason": ["stop", "stop"], "nan": false, "accept_ratio": null, "accepted_per_step": null, "mean_draft_tokens_per_step": null, "pos": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}
+[bench] run 3/3 phase=base-18-22q3-nospec-engramRAM-structured-c2 conc=2
+{"tok_s": 91.59276451596222, "ttft_s": 0.19988809450023837, "completion_tokens": 800, "aggregate_tok_s": 175.18993554647986, "finish_reason": ["stop", "stop"], "nan": false, "accept_ratio": null, "accepted_per_step": null, "mean_draft_tokens_per_step": null, "pos": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}
+{
+  "phase": "base-18-22q3-nospec-engramRAM-structured-c2",
+  "health_code": 200,
+  "health_body": "",
+  "ts": 1793035806.0198767,
+  "prompt": "structured-count-1-200",
+  "thinking": false,
+  "temperature": 0,
+  "concurrency": 2,
+  "note": "decode_ms_per_draft_step is a serving-cycle ratio, not a kernel timing",
+  "warmup": {
+    "tok_s": 105.45461477657169,
+    "ttft_s": 0.09986252700036857,
+    "completion_tokens": 32
+  },
+  "tok_s_median": 91.59276451596222,
+  "tok_s_min": 91.5393059455962,
+  "tok_s_max": 91.74820860420472,
+  "ttft_median_s": 0.16617097800008196,
+  "completion_tokens_median": 800.0,
+  "accept_ratio_median": null,
+  "accepted_per_step_median": null,
+  "mean_draft_tokens_per_step_median": null,
+  "aggregate_tok_s_median": 176.36309866139868,
+  "decode_ms_per_draft_step_median": null,
+  "any_nan": false,
+  "health_code_after": 200
+}
+wrote /opt/dsv41-gnmac/bench/out/base-18-22q3-nospec-engramRAM-structured-c2.json
+[bench] warmup (32 tokens)
+{"tok_s": 105.5194163659626, "ttft_s": 0.09846187600123812, "completion_tokens": 32}
+[bench] run 1/3 phase=base-18-22q3-nospec-engramRAM-structured-c4 conc=4
+{"tok_s": 87.17192106715973, "ttft_s": 0.2160199764994104, "completion_tokens": 1600, "aggregate_tok_s": 333.7199429509925, "finish_reason": ["stop", "stop", "stop", "stop"], "nan": false, "accept_ratio": null, "accepted_per_step": null, "mean_draft_tokens_per_step": null, "pos": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}
+[bench] run 2/3 phase=base-18-22q3-nospec-engramRAM-structured-c4 conc=4
+{"tok_s": 87.07376267537718, "ttft_s": 0.24844930049948744, "completion_tokens": 1600, "aggregate_tok_s": 331.1139773330638, "finish_reason": ["stop", "stop", "stop", "stop"], "nan": false, "accept_ratio": null, "accepted_per_step": null, "mean_draft_tokens_per_step": null, "pos": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}
+[bench] run 3/3 phase=base-18-22q3-nospec-engramRAM-structured-c4 conc=4
+{"tok_s": 79.67319972486195, "ttft_s": 0.2695553359990299, "completion_tokens": 1600, "aggregate_tok_s": 302.7775119065901, "finish_reason": ["stop", "stop", "stop", "stop"], "nan": false, "accept_ratio": null, "accepted_per_step": null, "mean_draft_tokens_per_step": null, "pos": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}
+{
+  "phase": "base-18-22q3-nospec-engramRAM-structured-c4",
+  "health_code": 200,
+  "health_body": "",
+  "ts": 1793035820.2458239,
+  "prompt": "structured-count-1-200",
+  "thinking": false,
+  "temperature": 0,
+  "concurrency": 4,
+  "note": "decode_ms_per_draft_step is a serving-cycle ratio, not a kernel timing",
+  "warmup": {
+    "tok_s": 105.5194163659626,
+    "ttft_s": 0.09846187600123812,
+    "completion_tokens": 32
+  },
+  "tok_s_median": 87.07376267537718,
+  "tok_s_min": 79.67319972486195,
+  "tok_s_max": 87.17192106715973,
+  "ttft_median_s": 0.24844930049948744,
+  "completion_tokens_median": 1600.0,
+  "accept_ratio_median": null,
+  "accepted_per_step_median": null,
+  "mean_draft_tokens_per_step_median": null,
+  "aggregate_tok_s_median": 331.1139773330638,
+  "decode_ms_per_draft_step_median": null,
+  "any_nan": false,
+  "health_code_after": 200
+}
+wrote /opt/dsv41-gnmac/bench/out/base-18-22q3-nospec-engramRAM-structured-c4.json
+[bench] warmup (32 tokens)
+{"tok_s": 105.37362953266206, "ttft_s": 0.136788476998845, "completion_tokens": 32}
+[bench] run 1/3 phase=base-18-22q3-nospec-engramRAM-structured-c8 conc=8
+{"tok_s": 73.24071221705486, "ttft_s": 0.6343826495003668, "completion_tokens": 3200, "aggregate_tok_s": 525.8084338889988, "finish_reason": ["stop", "stop", "stop", "stop", "stop", "stop", "stop", "stop"], "nan": false, "accept_ratio": null, "accepted_per_step": null, "mean_draft_tokens_per_step": null, "pos": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}
+[bench] run 2/3 phase=base-18-22q3-nospec-engramRAM-structured-c8 conc=8
+{"tok_s": 73.2814129294884, "ttft_s": 0.2361090875001537, "completion_tokens": 3200, "aggregate_tok_s": 562.9937994313782, "finish_reason": ["stop", "stop", "stop", "stop", "stop", "stop", "stop", "stop"], "nan": false, "accept_ratio": null, "accepted_per_step": null, "mean_draft_tokens_per_step": null, "pos": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}
+[bench] run 3/3 phase=base-18-22q3-nospec-engramRAM-structured-c8 conc=8
+{"tok_s": 73.22095137865549, "ttft_s": 0.25870726949960954, "completion_tokens": 3200, "aggregate_tok_s": 560.381510926683, "finish_reason": ["stop", "stop", "stop", "stop", "stop", "stop", "stop", "stop"], "nan": false, "accept_ratio": null, "accepted_per_step": null, "mean_draft_tokens_per_step": null, "pos": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}
+{
+  "phase": "base-18-22q3-nospec-engramRAM-structured-c8",
+  "health_code": 200,
+  "health_body": "",
+  "ts": 1793035835.7829754,
+  "prompt": "structured-count-1-200",
+  "thinking": false,
+  "temperature": 0,
+  "concurrency": 8,
+  "note": "decode_ms_per_draft_step is a serving-cycle ratio, not a kernel timing",
+  "warmup": {
+    "tok_s": 105.37362953266206,
+    "ttft_s": 0.136788476998845,
+    "completion_tokens": 32
+  },
+  "tok_s_median": 73.24071221705486,
+  "tok_s_min": 73.22095137865549,
+  "tok_s_max": 73.2814129294884,
+  "ttft_median_s": 0.25870726949960954,
+  "completion_tokens_median": 3200.0,
+  "accept_ratio_median": null,
+  "accepted_per_step_median": null,
+  "mean_draft_tokens_per_step_median": null,
+  "aggregate_tok_s_median": 560.381510926683,
+  "decode_ms_per_draft_step_median": null,
+  "any_nan": false,
+  "health_code_after": 200
+}
+wrote /opt/dsv41-gnmac/bench/out/base-18-22q3-nospec-engramRAM-structured-c8.json
+[bench] warmup (32 tokens)
+{"tok_s": 105.32591282596205, "ttft_s": 0.5802311679999548, "completion_tokens": 32}
+[bench] run 1/5 phase=base-18-22q3-nospec-engramRAM-code-c1 conc=1
+{"tok_s": 106.07449065004009, "ttft_s": 0.15270392100137542, "completion_tokens": 159, "aggregate_tok_s": null, "finish_reason": "stop", "nan": false, "accept_ratio": null, "accepted_per_step": null, "mean_draft_tokens_per_step": null, "pos": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}
+[bench] run 2/5 phase=base-18-22q3-nospec-engramRAM-code-c1 conc=1
+{"tok_s": 106.09956984162685, "ttft_s": 0.10137318899978709, "completion_tokens": 121, "aggregate_tok_s": null, "finish_reason": "stop", "nan": false, "accept_ratio": null, "accepted_per_step": null, "mean_draft_tokens_per_step": null, "pos": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}
+[bench] run 3/5 phase=base-18-22q3-nospec-engramRAM-code-c1 conc=1
+{"tok_s": 106.10301181736531, "ttft_s": 0.10022908500104677, "completion_tokens": 121, "aggregate_tok_s": null, "finish_reason": "stop", "nan": false, "accept_ratio": null, "accepted_per_step": null, "mean_draft_tokens_per_step": null, "pos": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}
+[bench] run 4/5 phase=base-18-22q3-nospec-engramRAM-code-c1 conc=1
+{"tok_s": 106.00309277104863, "ttft_s": 0.10377119599979778, "completion_tokens": 121, "aggregate_tok_s": null, "finish_reason": "stop", "nan": false, "accept_ratio": null, "accepted_per_step": null, "mean_draft_tokens_per_step": null, "pos": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}
+[bench] run 5/5 phase=base-18-22q3-nospec-engramRAM-code-c1 conc=1
+{"tok_s": 106.116168245172, "ttft_s": 0.11089461799929268, "completion_tokens": 121, "aggregate_tok_s": null, "finish_reason": "stop", "nan": false, "accept_ratio": null, "accepted_per_step": null, "mean_draft_tokens_per_step": null, "pos": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}
+{
+  "phase": "base-18-22q3-nospec-engramRAM-code-c1",
+  "health_code": 200,
+  "health_body": "",
+  "ts": 1793035853.9574018,
+  "prompt": "coding-clamp-range",
+  "thinking": false,
+  "temperature": 0,
+  "concurrency": 1,
+  "note": "decode_ms_per_draft_step is a serving-cycle ratio, not a kernel timing",
+  "warmup": {
+    "tok_s": 105.32591282596205,
+    "ttft_s": 0.5802311679999548,
+    "completion_tokens": 32
+  },
+  "tok_s_median": 106.09956984162685,
+  "tok_s_min": 106.00309277104863,
+  "tok_s_max": 106.116168245172,
+  "ttft_median_s": 0.10377119599979778,
+  "completion_tokens_median": 121.0,
+  "accept_ratio_median": null,
+  "accepted_per_step_median": null,
+  "mean_draft_tokens_per_step_median": null,
+  "aggregate_tok_s_median": null,
+  "decode_ms_per_draft_step_median": null,
+  "any_nan": false,
+  "health_code_after": 200
+}
+wrote /opt/dsv41-gnmac/bench/out/base-18-22q3-nospec-engramRAM-code-c1.json
+[bench] warmup (32 tokens)
+{"tok_s": 105.06623024333724, "ttft_s": 0.15295456999956514, "completion_tokens": 32}
+[bench] run 1/3 phase=base-18-22q3-nospec-engramRAM-code-c2 conc=2
+{"tok_s": 81.30789005557764, "ttft_s": 0.329003597999872, "completion_tokens": 242, "aggregate_tok_s": 132.09876801517697, "finish_reason": ["stop", "stop"], "nan": false, "accept_ratio": null, "accepted_per_step": null, "mean_draft_tokens_per_step": null, "pos": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}
+[bench] run 2/3 phase=base-18-22q3-nospec-engramRAM-code-c2 conc=2
+{"tok_s": 85.31239901053678, "ttft_s": 0.19359432849978475, "completion_tokens": 242, "aggregate_tok_s": 149.87449868694713, "finish_reason": ["stop", "stop"], "nan": false, "accept_ratio": null, "accepted_per_step": null, "mean_draft_tokens_per_step": null, "pos": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}
+[bench] run 3/3 phase=base-18-22q3-nospec-engramRAM-code-c2 conc=2
+{"tok_s": 89.11806823528188, "ttft_s": 0.15793322700028511, "completion_tokens": 195, "aggregate_tok_s": 134.03982374579908, "finish_reason": ["stop", "stop"], "nan": false, "accept_ratio": null, "accepted_per_step": null, "mean_draft_tokens_per_step": null, "pos": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}
+{
+  "phase": "base-18-22q3-nospec-engramRAM-code-c2",
+  "health_code": 200,
+  "health_body": "",
+  "ts": 1793035861.7061377,
+  "prompt": "coding-clamp-range",
+  "thinking": false,
+  "temperature": 0,
+  "concurrency": 2,
+  "note": "decode_ms_per_draft_step is a serving-cycle ratio, not a kernel timing",
+  "warmup": {
+    "tok_s": 105.06623024333724,
+    "ttft_s": 0.15295456999956514,
+    "completion_tokens": 32
+  },
+  "tok_s_median": 85.31239901053678,
+  "tok_s_min": 81.30789005557764,
+  "tok_s_max": 89.11806823528188,
+  "ttft_median_s": 0.19359432849978475,
+  "completion_tokens_median": 242.0,
+  "accept_ratio_median": null,
+  "accepted_per_step_median": null,
+  "mean_draft_tokens_per_step_median": null,
+  "aggregate_tok_s_median": 134.03982374579908,
+  "decode_ms_per_draft_step_median": null,
+  "any_nan": false,
+  "health_code_after": 200
+}
+wrote /opt/dsv41-gnmac/bench/out/base-18-22q3-nospec-engramRAM-code-c2.json
+[bench] warmup (32 tokens)
+{"tok_s": 105.48647616806578, "ttft_s": 0.12845125200146867, "completion_tokens": 32}
+[bench] run 1/3 phase=base-18-22q3-nospec-engramRAM-code-c4 conc=4
+{"tok_s": 65.3894647397284, "ttft_s": 0.5968810429994846, "completion_tokens": 342, "aggregate_tok_s": 141.96111578191932, "finish_reason": ["stop", "stop", "stop", "stop"], "nan": false, "accept_ratio": null, "accepted_per_step": null, "mean_draft_tokens_per_step": null, "pos": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}
+[bench] run 2/3 phase=base-18-22q3-nospec-engramRAM-code-c4 conc=4
+{"tok_s": 83.5533580361011, "ttft_s": 0.5546801069995126, "completion_tokens": 415, "aggregate_tok_s": 211.12785704935087, "finish_reason": ["stop", "stop", "stop", "stop"], "nan": false, "accept_ratio": null, "accepted_per_step": null, "mean_draft_tokens_per_step": null, "pos": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}
+[bench] run 3/3 phase=base-18-22q3-nospec-engramRAM-code-c4 conc=4
+{"tok_s": 83.58375707296975, "ttft_s": 0.3286903544994857, "completion_tokens": 415, "aggregate_tok_s": 239.1993955423839, "finish_reason": ["stop", "stop", "stop", "stop"], "nan": false, "accept_ratio": null, "accepted_per_step": null, "mean_draft_tokens_per_step": null, "pos": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}
+{
+  "phase": "base-18-22q3-nospec-engramRAM-code-c4",
+  "health_code": 200,
+  "health_body": "",
+  "ts": 1793035867.2716842,
+  "prompt": "coding-clamp-range",
+  "thinking": false,
+  "temperature": 0,
+  "concurrency": 4,
+  "note": "decode_ms_per_draft_step is a serving-cycle ratio, not a kernel timing",
+  "warmup": {
+    "tok_s": 105.48647616806578,
+    "ttft_s": 0.12845125200146867,
+    "completion_tokens": 32
+  },
+  "tok_s_median": 83.5533580361011,
+  "tok_s_min": 65.3894647397284,
+  "tok_s_max": 83.58375707296975,
+  "ttft_median_s": 0.5546801069995126,
+  "completion_tokens_median": 415.0,
+  "accept_ratio_median": null,
+  "accepted_per_step_median": null,
+  "mean_draft_tokens_per_step_median": null,
+  "aggregate_tok_s_median": 211.12785704935087,
+  "decode_ms_per_draft_step_median": null,
+  "any_nan": false,
+  "health_code_after": 200
+}
+wrote /opt/dsv41-gnmac/bench/out/base-18-22q3-nospec-engramRAM-code-c4.json
+[bench] warmup (32 tokens)
+{"tok_s": 105.56070466645738, "ttft_s": 0.09680287400078669, "completion_tokens": 32}
+[bench] run 1/3 phase=base-18-22q3-nospec-engramRAM-code-c8 conc=8
+{"tok_s": 69.59131365631144, "ttft_s": 0.28042657199966925, "completion_tokens": 688, "aggregate_tok_s": 375.8724463174896, "finish_reason": ["stop", "stop", "stop", "stop", "stop", "stop", "stop", "stop"], "nan": false, "accept_ratio": null, "accepted_per_step": null, "mean_draft_tokens_per_step": null, "pos": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}
+[bench] run 2/3 phase=base-18-22q3-nospec-engramRAM-code-c8 conc=8
+{"tok_s": 70.50197663930807, "ttft_s": 0.3396016705000875, "completion_tokens": 576, "aggregate_tok_s": 312.61967251346425, "finish_reason": ["stop", "stop", "stop", "stop", "stop", "stop", "stop", "stop"], "nan": false, "accept_ratio": null, "accepted_per_step": null, "mean_draft_tokens_per_step": null, "pos": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}
+[bench] run 3/3 phase=base-18-22q3-nospec-engramRAM-code-c8 conc=8
+{"tok_s": 72.09472865642147, "ttft_s": 0.32004712199977803, "completion_tokens": 692, "aggregate_tok_s": 376.0364644298745, "finish_reason": ["stop", "stop", "stop", "stop", "stop", "stop", "stop", "stop"], "nan": false, "accept_ratio": null, "accepted_per_step": null, "mean_draft_tokens_per_step": null, "pos": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}
+{
+  "phase": "base-18-22q3-nospec-engramRAM-code-c8",
+  "health_code": 200,
+  "health_body": "",
+  "ts": 1793035874.0235035,
+  "prompt": "coding-clamp-range",
+  "thinking": false,
+  "temperature": 0,
+  "concurrency": 8,
+  "note": "decode_ms_per_draft_step is a serving-cycle ratio, not a kernel timing",
+  "warmup": {
+    "tok_s": 105.56070466645738,
+    "ttft_s": 0.09680287400078669,
+    "completion_tokens": 32
+  },
+  "tok_s_median": 70.50197663930807,
+  "tok_s_min": 69.59131365631144,
+  "tok_s_max": 72.09472865642147,
+  "ttft_median_s": 0.32004712199977803,
+  "completion_tokens_median": 688.0,
+  "accept_ratio_median": null,
+  "accepted_per_step_median": null,
+  "mean_draft_tokens_per_step_median": null,
+  "aggregate_tok_s_median": 375.8724463174896,
+  "decode_ms_per_draft_step_median": null,
+  "any_nan": false,
+  "health_code_after": 200
+}
+wrote /opt/dsv41-gnmac/bench/out/base-18-22q3-nospec-engramRAM-code-c8.json
+[bench] run 1/5 phase=base-18-22q3-nospec-engramRAM-prose-c1 conc=1
+{"tok_s": 105.4482744896339, "ttft_s": 0.09603135799989104, "completion_tokens": 400, "aggregate_tok_s": null, "finish_reason": "length", "nan": false, "accept_ratio": null, "accepted_per_step": null, "mean_draft_tokens_per_step": null, "pos": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}
+[bench] run 2/5 phase=base-18-22q3-nospec-engramRAM-prose-c1 conc=1
+{"tok_s": 105.44017504986765, "ttft_s": 0.10127097000076901, "completion_tokens": 400, "aggregate_tok_s": null, "finish_reason": "length", "nan": false, "accept_ratio": null, "accepted_per_step": null, "mean_draft_tokens_per_step": null, "pos": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}
+[bench] run 3/5 phase=base-18-22q3-nospec-engramRAM-prose-c1 conc=1
+{"tok_s": 105.28589420376387, "ttft_s": 0.10038664500098093, "completion_tokens": 400, "aggregate_tok_s": null, "finish_reason": "length", "nan": false, "accept_ratio": null, "accepted_per_step": null, "mean_draft_tokens_per_step": null, "pos": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}
+[bench] run 4/5 phase=base-18-22q3-nospec-engramRAM-prose-c1 conc=1
+{"tok_s": 105.43462519230484, "ttft_s": 0.0999454369994055, "completion_tokens": 400, "aggregate_tok_s": null, "finish_reason": "length", "nan": false, "accept_ratio": null, "accepted_per_step": null, "mean_draft_tokens_per_step": null, "pos": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}
+[bench] run 5/5 phase=base-18-22q3-nospec-engramRAM-prose-c1 conc=1
+{"tok_s": 105.37043155452513, "ttft_s": 0.1510136289998627, "completion_tokens": 400, "aggregate_tok_s": null, "finish_reason": "length", "nan": false, "accept_ratio": null, "accepted_per_step": null, "mean_draft_tokens_per_step": null, "pos": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}
+{
+  "phase": "base-18-22q3-nospec-engramRAM-prose-c1",
+  "health_code": 200,
+  "health_body": "",
+  "ts": 1793035880.1505094,
+  "prompt": "hashmap-prose",
+  "thinking": false,
+  "temperature": 0,
+  "concurrency": 1,
+  "note": "decode_ms_per_draft_step is a serving-cycle ratio, not a kernel timing",
+  "tok_s_median": 105.43462519230484,
+  "tok_s_min": 105.28589420376387,
+  "tok_s_max": 105.4482744896339,
+  "ttft_median_s": 0.10038664500098093,
+  "completion_tokens_median": 400.0,
+  "accept_ratio_median": null,
+  "accepted_per_step_median": null,
+  "mean_draft_tokens_per_step_median": null,
+  "aggregate_tok_s_median": null,
+  "decode_ms_per_draft_step_median": null,
+  "any_nan": false,
+  "health_code_after": 200
+}
+wrote /opt/dsv41-gnmac/bench/out/base-18-22q3-nospec-engramRAM-prose-c1.json
+[bench] warmup (32 tokens)
+{"tok_s": 105.31087820531023, "ttft_s": 0.09788486899924465, "completion_tokens": 32}
+[bench] run 1/3 phase=base-18-22q3-nospec-engramRAM-prose-c2 conc=2
+{"tok_s": 83.62812216827743, "ttft_s": 0.37392256949988223, "completion_tokens": 800, "aggregate_tok_s": 154.8908992765603, "finish_reason": ["length", "length"], "nan": false, "accept_ratio": null, "accepted_per_step": null, "mean_draft_tokens_per_step": null, "pos": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}
+[bench] run 2/3 phase=base-18-22q3-nospec-engramRAM-prose-c2 conc=2
+{"tok_s": 92.44237667362, "ttft_s": 0.49977553550070297, "completion_tokens": 800, "aggregate_tok_s": 166.08657159987789, "finish_reason": ["length", "length"], "nan": false, "accept_ratio": null, "accepted_per_step": null, "mean_draft_tokens_per_step": null, "pos": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}
+[bench] run 3/3 phase=base-18-22q3-nospec-engramRAM-prose-c2 conc=2
+{"tok_s": 87.8292426046919, "ttft_s": 0.15162932699968223, "completion_tokens": 800, "aggregate_tok_s": 170.21100217309836, "finish_reason": ["length", "length"], "nan": false, "accept_ratio": null, "accepted_per_step": null, "mean_draft_tokens_per_step": null, "pos": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}
+{
+  "phase": "base-18-22q3-nospec-engramRAM-prose-c2",
+  "health_code": 200,
+  "health_body": "",
+  "ts": 1793035899.8590598,
+  "prompt": "hashmap-prose",
+  "thinking": false,
+  "temperature": 0,
+  "concurrency": 2,
+  "note": "decode_ms_per_draft_step is a serving-cycle ratio, not a kernel timing",
+  "warmup": {
+    "tok_s": 105.31087820531023,
+    "ttft_s": 0.09788486899924465,
+    "completion_tokens": 32
+  },
+  "tok_s_median": 87.8292426046919,
+  "tok_s_min": 83.62812216827743,
+  "tok_s_max": 92.44237667362,
+  "ttft_median_s": 0.37392256949988223,
+  "completion_tokens_median": 800.0,
+  "accept_ratio_median": null,
+  "accepted_per_step_median": null,
+  "mean_draft_tokens_per_step_median": null,
+  "aggregate_tok_s_median": 166.08657159987789,
+  "decode_ms_per_draft_step_median": null,
+  "any_nan": false,
+  "health_code_after": 200
+}
+wrote /opt/dsv41-gnmac/bench/out/base-18-22q3-nospec-engramRAM-prose-c2.json
+[bench] warmup (32 tokens)
+{"tok_s": 105.08183268058806, "ttft_s": 0.10111252100068668, "completion_tokens": 32}
+[bench] run 1/3 phase=base-18-22q3-nospec-engramRAM-prose-c4 conc=4
+{"tok_s": 73.8973942492982, "ttft_s": 0.9783987604996582, "completion_tokens": 1600, "aggregate_tok_s": 250.7971823170458, "finish_reason": ["length", "length", "length", "length"], "nan": false, "accept_ratio": null, "accepted_per_step": null, "mean_draft_tokens_per_step": null, "pos": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}
+[bench] run 2/3 phase=base-18-22q3-nospec-engramRAM-prose-c4 conc=4
+{"tok_s": 74.35534072676614, "ttft_s": 0.29608697650019167, "completion_tokens": 1600, "aggregate_tok_s": 282.48017333728694, "finish_reason": ["length", "length", "length", "length"], "nan": false, "accept_ratio": null, "accepted_per_step": null, "mean_draft_tokens_per_step": null, "pos": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}
+[bench] run 3/3 phase=base-18-22q3-nospec-engramRAM-prose-c4 conc=4
+{"tok_s": 75.99865743737382, "ttft_s": 0.2161252309988413, "completion_tokens": 1600, "aggregate_tok_s": 292.61821629130867, "finish_reason": ["length", "length", "length", "length"], "nan": false, "accept_ratio": null, "accepted_per_step": null, "mean_draft_tokens_per_step": null, "pos": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}
+{
+  "phase": "base-18-22q3-nospec-engramRAM-prose-c4",
+  "health_code": 200,
+  "health_body": "",
+  "ts": 1793035915.1597018,
+  "prompt": "hashmap-prose",
+  "thinking": false,
+  "temperature": 0,
+  "concurrency": 4,
+  "note": "decode_ms_per_draft_step is a serving-cycle ratio, not a kernel timing",
+  "warmup": {
+    "tok_s": 105.08183268058806,
+    "ttft_s": 0.10111252100068668,
+    "completion_tokens": 32
+  },
+  "tok_s_median": 74.35534072676614,
+  "tok_s_min": 73.8973942492982,
+  "tok_s_max": 75.99865743737382,
+  "ttft_median_s": 0.29608697650019167,
+  "completion_tokens_median": 1600.0,
+  "accept_ratio_median": null,
+  "accepted_per_step_median": null,
+  "mean_draft_tokens_per_step_median": null,
+  "aggregate_tok_s_median": 282.48017333728694,
+  "decode_ms_per_draft_step_median": null,
+  "any_nan": false,
+  "health_code_after": 200
+}
+wrote /opt/dsv41-gnmac/bench/out/base-18-22q3-nospec-engramRAM-prose-c4.json
+[bench] warmup (32 tokens)
+{"tok_s": 105.1989957951771, "ttft_s": 0.10262821300057112, "completion_tokens": 32}
+[bench] run 1/3 phase=base-18-22q3-nospec-engramRAM-prose-c8 conc=8
+{"tok_s": 57.66052381447444, "ttft_s": 0.258814818999781, "completion_tokens": 3200, "aggregate_tok_s": 445.582563433962, "finish_reason": ["length", "length", "length", "length", "length", "length", "length", "length"], "nan": false, "accept_ratio": null, "accepted_per_step": null, "mean_draft_tokens_per_step": null, "pos": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}
+[bench] run 2/3 phase=base-18-22q3-nospec-engramRAM-prose-c8 conc=8
+{"tok_s": 58.455808606055214, "ttft_s": 0.32088688200019533, "completion_tokens": 3200, "aggregate_tok_s": 447.61468903222857, "finish_reason": ["length", "length", "length", "length", "length", "length", "length", "length"], "nan": false, "accept_ratio": null, "accepted_per_step": null, "mean_draft_tokens_per_step": null, "pos": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}
+[bench] run 3/3 phase=base-18-22q3-nospec-engramRAM-prose-c8 conc=8
+{"tok_s": 58.179177808983425, "ttft_s": 0.31760634549937095, "completion_tokens": 3200, "aggregate_tok_s": 445.74062909689724, "finish_reason": ["length", "length", "length", "length", "length", "length", "length", "length"], "nan": false, "accept_ratio": null, "accepted_per_step": null, "mean_draft_tokens_per_step": null, "pos": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}
+{
+  "phase": "base-18-22q3-nospec-engramRAM-prose-c8",
+  "health_code": 200,
+  "health_body": "",
+  "ts": 1793035933.2840955,
+  "prompt": "hashmap-prose",
+  "thinking": false,
+  "temperature": 0,
+  "concurrency": 8,
+  "note": "decode_ms_per_draft_step is a serving-cycle ratio, not a kernel timing",
+  "warmup": {
+    "tok_s": 105.1989957951771,
+    "ttft_s": 0.10262821300057112,
+    "completion_tokens": 32
+  },
+  "tok_s_median": 58.179177808983425,
+  "tok_s_min": 57.66052381447444,
+  "tok_s_max": 58.455808606055214,
+  "ttft_median_s": 0.31760634549937095,
+  "completion_tokens_median": 3200.0,
+  "accept_ratio_median": null,
+  "accepted_per_step_median": null,
+  "mean_draft_tokens_per_step_median": null,
+  "aggregate_tok_s_median": 445.74062909689724,
+  "decode_ms_per_draft_step_median": null,
+  "any_nan": false,
+  "health_code_after": 200
+}
+wrote /opt/dsv41-gnmac/bench/out/base-18-22q3-nospec-engramRAM-prose-c8.json
+
+| base-18-22q3-nospec-engramRAM | structured | code | prose |
+|---|---:|---:|---:|
+| 1 user, streaming | 105.5 | 106.1 | 105.4 |
+| 2 users, aggregate | 176.4 | 134.0 | 166.1 |
+| 4 users, aggregate | 331.1 | 211.1 | 282.5 |
+| 8 users, aggregate | 560.4 | 375.9 | 445.7 |
+MIA base-18-22q3-nospec-engramRAM {"structured 1u": 105.5, "structured 2u": 176.4, "structured 4u": 331.1, "structured 8u": 560.4, "code 1u": 106.1, "code 2u": 134.0, "code 4u": 211.1, "code 8u": 375.9, "prose 1u": 105.4, "prose 2u": 166.1, "prose 4u": 282.5, "prose 8u": 445.7}

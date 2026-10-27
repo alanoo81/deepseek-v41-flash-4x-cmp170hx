@@ -1,0 +1,11 @@
+pride-and-prejudice   24028 tokens    9.42 s     2550 tok/s  cached=0
+pride-and-prejudice   24027 tokens    9.36 s     2568 tok/s  cached=0
+pride-and-prejudice   24026 tokens    9.35 s     2569 tok/s  cached=0
+moby-dick             34026 tokens   13.53 s     2515 tok/s  cached=0
+moby-dick             34026 tokens   13.55 s     2511 tok/s  cached=0
+moby-dick             34027 tokens   13.53 s     2514 tok/s  cached=0
+war-and-peace         38025 tokens   15.32 s     2481 tok/s  cached=0
+war-and-peace         38025 tokens   15.18 s     2505 tok/s  cached=0
+war-and-peace         38028 tokens   15.28 s     2489 tok/s  cached=0
+cold prefill median of 9: 2514 tok/s
+FIN

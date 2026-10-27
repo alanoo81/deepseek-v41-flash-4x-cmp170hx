@@ -1,0 +1,10 @@
+passe 1 (à froid) : 100/100 copies exactes, 0 lignes fausses, cache 0/69940 jetons de prompt (0 %), 185 s
+passe 2 (même prompt, cache de préfixes) : 100/100 copies exactes, 0 lignes fausses, cache 64000/69940 jetons de prompt (92 %), 161 s
+passe 3 (2e tour sur préfixe en cache) : 100/100 copies exactes, 0 lignes fausses, cache 64000/205580 jetons de prompt (31 %), 207 s
+tâche 0 : 5/5 exactes, 1 sortie(s) distincte(s) sur 5
+tâche 1 : 5/5 exactes, 1 sortie(s) distincte(s) sur 5
+tâche 2 : 5/5 exactes, 1 sortie(s) distincte(s) sur 5
+tâche 3 : 5/5 exactes, 1 sortie(s) distincte(s) sur 5
+tâche 4 : 5/5 exactes, 1 sortie(s) distincte(s) sur 5
+
+[exited with code 0]

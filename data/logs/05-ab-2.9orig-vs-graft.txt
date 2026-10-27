@@ -1,0 +1,24 @@
+ready: http://127.0.0.1:8011/v1 (model deepseek-v4.1-flash)
+(Worker_TP0 pid=194) INFO 10-26 19:46:56 [gpu_model_runner.py:5672] Model loading took 51.3 GiB memory and 196.804372 seconds
+(EngineCore pid=149) INFO 10-26 19:47:04 [kv_cache_utils.py:2325] GPU KV cache size: 3,347,338 tokens, Maximum concurrency for 262,144 tokens per request: 12.77
+saved runs/k29.json
+saved runs/k29-short.json
+== 2.9 orig (A) vs greffe 3 bits (B), longues
+
+set      n    PPL_A    PPL_B    dPPL%    boot 95% CI dPPL%     mean d     sd d  B<A/B>A   sign p   wilc p   MDE%  dTop1%
+fr      64   2.2231   2.1242   -4.451  [  -4.974,  -3.934]   -0.04553  0.02241     64/0 1.08e-19 3.61e-12  0.799  +1.303
+en      64   1.3284   1.3191   -0.701  [  -0.946,  -0.477]   -0.00703  0.00976    50/14 7.07e-06 2.76e-07  0.347  +0.205
+code    64   2.9901   2.9846   -0.184  [  -0.331,  -0.039]   -0.00184  0.00606    36/28    0.382    0.058  0.215  +0.047
+all    192   2.0669   2.0298   -1.797  [  -1.996,  -1.600]   -0.01813  0.02431   150/42 1.94e-15 2.69e-21  0.495  +0.518
+== courtes
+
+set      n    PPL_A    PPL_B    dPPL%    boot 95% CI dPPL%     mean d     sd d  B<A/B>A   sign p   wilc p   MDE%  dTop1%
+fr     400  12.6250  12.5134   -0.884  [  -1.607,  -0.164]   -0.00888  0.07430  213/187    0.211   0.0138  1.048  +0.365
+en     400   7.0539   6.9919   -0.880  [  -1.479,  -0.284]   -0.00884  0.06200  218/182     0.08  0.00989  0.874  +0.468
+code   400  23.9517  23.9634   +0.049  [  -0.426,  +0.520]   +0.00049  0.04826  184/216    0.121    0.443  0.680  -0.077
+all   1200  12.8726  12.7989   -0.573  [  -0.919,  -0.221]   -0.00574  0.06253  615/585    0.403  0.00699  0.507  +0.252
+passe 1 (à froid) : 20/20 copies exactes, 0 lignes fausses, cache 0/13921 jetons de prompt (0 %), 39 s
+passe 2 (même prompt, cache de préfixes) : 20/20 copies exactes, 0 lignes fausses, cache 12800/13921 jetons de prompt (92 %), 34 s
+passe 3 (2e tour sur préfixe en cache) : 20/20 copies exactes, 0 lignes fausses, cache 12800/40985 jetons de prompt (31 %), 44 s
+
+[exited with code 0]

@@ -1,0 +1,11 @@
+--- a/tools/fetch_official_nonexpert.py  (GNmac-lab/deepseek-v41-flash-1017-cmp170hx @ 2ad5741ab1)
++++ b/tools/fetch_official_nonexpert.py  (this repo)
+@@ -12,7 +12,7 @@
+ import time
+ import urllib.request
+ 
+-REPO = "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash-1017/resolve/main/"
++REPO = "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash-1017/resolve/" + os.environ.get("OFF_REV", "main") + "/"  # dsv41-4x: pinned revision
+ OUT = sys.argv[1]
+ os.makedirs(OUT, exist_ok=True)
+ 

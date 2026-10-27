@@ -1,0 +1,31 @@
+started ds41-flash (tp4) on 127.0.0.1:8011; logs: docker logs -f ds41-flash
+waiting for the engine (first start compiles kernels: ~6-10 min)...
+ready: http://127.0.0.1:8011/v1 (model deepseek-v4.1-flash)
+(Worker_TP2 pid=271) INFO 10-26 17:18:40 [interface.py:635] Setting kv cache block size to 128 for TRITON_MLA_SPARSE_DSV41 backend.
+(Worker_TP3 pid=272) INFO 10-26 17:18:40 [interface.py:635] Setting kv cache block size to 128 for TRITON_MLA_SPARSE_DSV41 backend.
+(Worker_TP1 pid=270) INFO 10-26 17:18:40 [interface.py:635] Setting kv cache block size to 128 for TRITON_MLA_SPARSE_DSV41 backend.
+(Worker_TP0 pid=269) INFO 10-26 17:18:41 [interface.py:635] Setting kv cache block size to 128 for TRITON_MLA_SPARSE_DSV41 backend.
+(EngineCore pid=224) INFO 10-26 17:18:41 [utils.py:306] Using BLHNC KV cache layout.
+(Worker_TP1 pid=270) INFO 10-26 17:19:22 [gpu_model_runner.py:1182] DSV41 engram static meta: group 0 (block_size 32, table (8, 8192)) for language_model.model.layers.0.attn.swa_cache
+(Worker_TP0 pid=269) INFO 10-26 17:19:22 [gpu_model_runner.py:1182] DSV41 engram static meta: group 0 (block_size 32, table (8, 8192)) for language_model.model.layers.0.attn.swa_cache
+(Worker_TP3 pid=272) INFO 10-26 17:19:22 [gpu_model_runner.py:1182] DSV41 engram static meta: group 0 (block_size 32, table (8, 8192)) for language_model.model.layers.0.attn.swa_cache
+(Worker_TP2 pid=271) INFO 10-26 17:19:22 [gpu_model_runner.py:1182] DSV41 engram static meta: group 0 (block_size 32, table (8, 8192)) for language_model.model.layers.0.attn.swa_cache
+(Worker_TP3 pid=272) INFO 10-26 17:19:38 [gpu_worker.py:667] CUDA graph memory profiling is enabled (default since v0.21.0). The current --gpu-memory-utilization=0.9500 is equivalent to --gpu-memory-utilization=0.9269 without CUDA graph memory profiling. To ma
+(Worker_TP0 pid=269) INFO 10-26 17:19:38 [gpu_worker.py:652] Available KV cache memory: 3.84 GiB
+(Worker_TP0 pid=269) INFO 10-26 17:19:38 [gpu_worker.py:667] CUDA graph memory profiling is enabled (default since v0.21.0). The current --gpu-memory-utilization=0.9500 is equivalent to --gpu-memory-utilization=0.9269 without CUDA graph memory profiling. To ma
+(Worker_TP1 pid=270) INFO 10-26 17:19:38 [gpu_worker.py:667] CUDA graph memory profiling is enabled (default since v0.21.0). The current --gpu-memory-utilization=0.9500 is equivalent to --gpu-memory-utilization=0.9269 without CUDA graph memory profiling. To ma
+(Worker_TP2 pid=271) INFO 10-26 17:19:38 [gpu_worker.py:667] CUDA graph memory profiling is enabled (default since v0.21.0). The current --gpu-memory-utilization=0.9500 is equivalent to --gpu-memory-utilization=0.9269 without CUDA graph memory profiling. To ma
+(EngineCore pid=224) INFO 10-26 17:19:38 [kv_cache_utils.py:2325] GPU KV cache size: 1,812,663 tokens, Maximum concurrency for 262,144 tokens per request: 6.91x
+(Worker_TP0 pid=269) INFO 10-26 17:19:41 [dsv41_variants.py:47] dsv41 variants applied: dsv41_topk_meta, dsv41_h2d_lean, dsv41_ragged_lean, dsv41_gate, dsv41_ce_ring, dsv41_split_reduce, dsv41_moe_try, dsv41_engram_prefetch, dsv41_mhc_pcfg, dsv41_moe_v2try, ds
+(Worker_TP3 pid=272) INFO 10-26 17:19:41 [dsv41_variants.py:47] dsv41 variants applied: dsv41_topk_meta, dsv41_h2d_lean, dsv41_ragged_lean, dsv41_gate, dsv41_ce_ring, dsv41_split_reduce, dsv41_moe_try, dsv41_engram_prefetch, dsv41_mhc_pcfg, dsv41_moe_v2try, ds
+(Worker_TP2 pid=271) INFO 10-26 17:19:41 [dsv41_variants.py:47] dsv41 variants applied: dsv41_topk_meta, dsv41_h2d_lean, dsv41_ragged_lean, dsv41_gate, dsv41_ce_ring, dsv41_split_reduce, dsv41_moe_try, dsv41_engram_prefetch, dsv41_mhc_pcfg, dsv41_moe_v2try, ds
+(Worker_TP1 pid=270) INFO 10-26 17:19:41 [dsv41_variants.py:47] dsv41 variants applied: dsv41_topk_meta, dsv41_h2d_lean, dsv41_ragged_lean, dsv41_gate, dsv41_ce_ring, dsv41_split_reduce, dsv41_moe_try, dsv41_engram_prefetch, dsv41_mhc_pcfg, dsv41_moe_v2try, ds
+(EngineCore pid=224) INFO 10-26 17:20:39 [shm_broadcast.py:801] No available shared memory broadcast block found in 60 seconds. This typically happens when some processes are hanging or doing some time-consuming work (e.g. compilation, weight/kv cache quantiza
+(Worker_TP1 pid=270) INFO 10-26 17:21:11 [gpu_worker.py:887] Free memory on device (62.82/63.39 GiB) on startup. Desired GPU memory utilization is (0.95, 60.22 GiB). Actual usage is 54.13 GiB for consumed memory (weights + non-torch), 2.26 GiB for peak activat
+(Worker_TP2 pid=271) INFO 10-26 17:21:11 [gpu_worker.py:887] Free memory on device (62.82/63.39 GiB) on startup. Desired GPU memory utilization is (0.95, 60.22 GiB). Actual usage is 54.1 GiB for consumed memory (weights + non-torch), 2.26 GiB for peak activati
+(Worker_TP3 pid=272) INFO 10-26 17:21:11 [gpu_worker.py:887] Free memory on device (62.86/63.39 GiB) on startup. Desired GPU memory utilization is (0.95, 60.22 GiB). Actual usage is 54.04 GiB for consumed memory (weights + non-torch), 2.26 GiB for peak activat
+(Worker_TP0 pid=269) INFO 10-26 17:21:11 [gpu_worker.py:887] Free memory on device (62.83/63.39 GiB) on startup. Desired GPU memory utilization is (0.95, 60.22 GiB). Actual usage is 54.12 GiB for consumed memory (weights + non-torch), 2.26 GiB for peak activat
+(EngineCore pid=224) INFO 10-26 17:21:11 [core.py:397] init engine (profile, create kv cache, warmup model) took 150.38 s
+18:21:48
+
+[exited with code 0]

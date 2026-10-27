@@ -1,0 +1,14 @@
+ready: http://127.0.0.1:8011/v1 (model deepseek-v4.1-flash)
+(Worker_TP0 pid=270) INFO 10-26 20:30:03 [gpu_model_runner.py:5672] Model loading took 55.54 GiB memory and 195.379664 seconds
+(Worker_TP0 pid=270) INFO 10-26 20:30:15 [gpu_worker.py:652] Available KV cache memory: 2.35 GiB
+(EngineCore pid=225) INFO 10-26 20:30:15 [kv_cache_utils.py:2325] GPU KV cache size: 1,113,781 tokens, Maximum concurrency for 262,144 tokens per request: 4.25x
+| dspark-greffe | structured | code | prose |
+|---|---:|---:|---:|
+| 1 user, streaming | 369.8 | 267.3 | 200.1 |
+| 8 users, aggregate | 852.9 | 450.3 | 437.8 |
+MIA dspark-greffe {"structured 1u": 369.8, "structured 8u": 852.9, "code 1u": 267.3, "code 8u": 450.3, "prose 1u": 200.1, "prose 8u": 437.8}
+"accept_ratio": 0.994 "accept_ratio": 0.994 "accept_ratio": 0.994 "accept_ratio": 0.994 "accept_ratio": 0.994 "accept_ratio": 0.9937 passe 1 (à froid) : 20/20 copies exactes, 0 lignes fausses, cache 0/13921 jetons de prompt (0 %), 33 s
+passe 2 (même prompt, cache de préfixes) : 20/20 copies exactes, 0 lignes fausses, cache 12800/13921 jetons de prompt (92 %), 25 s
+passe 3 (2e tour sur préfixe en cache) : 20/20 copies exactes, 0 lignes fausses, cache 12800/40985 jetons de prompt (31 %), 37 s
+
+[exited with code 0]

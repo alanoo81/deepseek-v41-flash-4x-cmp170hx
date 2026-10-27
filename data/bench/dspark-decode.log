@@ -1,0 +1,233 @@
+[bench] warmup (32 tokens)
+{"tok_s": 14.375234801785169, "ttft_s": 1.7936024260015984, "completion_tokens": 32}
+[bench] run 1/5 phase=dspark-greffe-structured-c1 conc=1
+{"tok_s": 369.313413413072, "ttft_s": 0.11268817300151568, "completion_tokens": 400, "aggregate_tok_s": null, "finish_reason": "stop", "nan": false, "accept_ratio": 0.994, "accepted_per_step": 4.97, "mean_draft_tokens_per_step": 5.0, "pos": [1.0, 1.0, 1.0, 0.9851, 0.9851, 0.0, 0.0]}
+[bench] run 2/5 phase=dspark-greffe-structured-c1 conc=1
+{"tok_s": 370.14065021862086, "ttft_s": 0.1394760610019148, "completion_tokens": 400, "aggregate_tok_s": null, "finish_reason": "stop", "nan": false, "accept_ratio": 0.994, "accepted_per_step": 4.97, "mean_draft_tokens_per_step": 5.0, "pos": [1.0, 1.0, 1.0, 0.9851, 0.9851, 0.0, 0.0]}
+[bench] run 3/5 phase=dspark-greffe-structured-c1 conc=1
+{"tok_s": 369.8093922122446, "ttft_s": 0.10410689599666512, "completion_tokens": 400, "aggregate_tok_s": null, "finish_reason": "stop", "nan": false, "accept_ratio": 0.994, "accepted_per_step": 4.97, "mean_draft_tokens_per_step": 5.0, "pos": [1.0, 1.0, 1.0, 0.9851, 0.9851, 0.0, 0.0]}
+[bench] run 4/5 phase=dspark-greffe-structured-c1 conc=1
+{"tok_s": 370.078717218402, "ttft_s": 0.14410056300039287, "completion_tokens": 400, "aggregate_tok_s": null, "finish_reason": "stop", "nan": false, "accept_ratio": 0.994, "accepted_per_step": 4.97, "mean_draft_tokens_per_step": 5.0, "pos": [1.0, 1.0, 1.0, 0.9851, 0.9851, 0.0, 0.0]}
+[bench] run 5/5 phase=dspark-greffe-structured-c1 conc=1
+{"tok_s": 369.0556972342413, "ttft_s": 0.10493490999942878, "completion_tokens": 400, "aggregate_tok_s": null, "finish_reason": "stop", "nan": false, "accept_ratio": 0.994, "accepted_per_step": 4.97, "mean_draft_tokens_per_step": 5.0, "pos": [1.0, 1.0, 1.0, 0.9851, 0.9851, 0.0, 0.0]}
+{
+  "phase": "dspark-greffe-structured-c1",
+  "health_code": 200,
+  "health_body": "",
+  "ts": 1793046710.9671643,
+  "prompt": "structured-count-1-200",
+  "thinking": false,
+  "temperature": 0,
+  "concurrency": 1,
+  "note": "decode_ms_per_draft_step is a serving-cycle ratio, not a kernel timing",
+  "warmup": {
+    "tok_s": 14.375234801785169,
+    "ttft_s": 1.7936024260015984,
+    "completion_tokens": 32
+  },
+  "tok_s_median": 369.8093922122446,
+  "tok_s_min": 369.0556972342413,
+  "tok_s_max": 370.14065021862086,
+  "ttft_median_s": 0.11268817300151568,
+  "completion_tokens_median": 400.0,
+  "accept_ratio_median": 0.994,
+  "accepted_per_step_median": 4.97,
+  "mean_draft_tokens_per_step_median": 5.0,
+  "aggregate_tok_s_median": null,
+  "decode_ms_per_draft_step_median": 16.103495492562114,
+  "any_nan": false,
+  "health_code_after": 200
+}
+wrote /opt/dsv41-gnmac/bench/out/dspark-greffe-structured-c1.json
+[bench] warmup (32 tokens)
+{"tok_s": 313.8026320491263, "ttft_s": 0.1531753960007336, "completion_tokens": 32}
+[bench] run 1/3 phase=dspark-greffe-structured-c8 conc=8
+{"tok_s": 104.26086224603647, "ttft_s": 2.0443476185009786, "completion_tokens": 3200, "aggregate_tok_s": 544.5665218483904, "finish_reason": ["stop", "stop", "stop", "stop", "stop", "stop", "stop", "stop"], "nan": false, "accept_ratio": 0.9937, "accepted_per_step": 4.968, "mean_draft_tokens_per_step": 5.0, "pos": [1.0, 1.0, 0.9981, 0.9851, 0.9851, 0.0, 0.0]}
+[bench] run 2/3 phase=dspark-greffe-structured-c8 conc=8
+{"tok_s": 124.19252988822869, "ttft_s": 0.5367729905010492, "completion_tokens": 3200, "aggregate_tok_s": 852.8676023500032, "finish_reason": ["stop", "stop", "stop", "stop", "stop", "stop", "stop", "stop"], "nan": false, "accept_ratio": 0.994, "accepted_per_step": 4.97, "mean_draft_tokens_per_step": 5.0, "pos": [1.0, 1.0, 1.0, 0.9851, 0.9851, 0.0, 0.0]}
+[bench] run 3/3 phase=dspark-greffe-structured-c8 conc=8
+{"tok_s": 124.75720373795278, "ttft_s": 0.15180809549929108, "completion_tokens": 3200, "aggregate_tok_s": 954.5226253068739, "finish_reason": ["stop", "stop", "stop", "stop", "stop", "stop", "stop", "stop"], "nan": false, "accept_ratio": 0.994, "accepted_per_step": 4.97, "mean_draft_tokens_per_step": 5.0, "pos": [1.0, 1.0, 1.0, 0.9851, 0.9851, 0.0, 0.0]}
+{
+  "phase": "dspark-greffe-structured-c8",
+  "health_code": 200,
+  "health_body": "",
+  "ts": 1793046721.5306146,
+  "prompt": "structured-count-1-200",
+  "thinking": false,
+  "temperature": 0,
+  "concurrency": 8,
+  "note": "decode_ms_per_draft_step is a serving-cycle ratio, not a kernel timing",
+  "warmup": {
+    "tok_s": 313.8026320491263,
+    "ttft_s": 0.1531753960007336,
+    "completion_tokens": 32
+  },
+  "tok_s_median": 124.19252988822869,
+  "tok_s_min": 104.26086224603647,
+  "tok_s_max": 124.75720373795278,
+  "ttft_median_s": 0.5367729905010492,
+  "completion_tokens_median": 3200.0,
+  "accept_ratio_median": 0.994,
+  "accepted_per_step_median": 4.97,
+  "mean_draft_tokens_per_step_median": 5.0,
+  "aggregate_tok_s_median": 852.8676023500032,
+  "decode_ms_per_draft_step_median": 5.993943333955193,
+  "any_nan": false,
+  "health_code_after": 200
+}
+wrote /opt/dsv41-gnmac/bench/out/dspark-greffe-structured-c8.json
+[bench] warmup (32 tokens)
+{"tok_s": 256.72847017946634, "ttft_s": 0.4044654469980742, "completion_tokens": 32}
+[bench] run 1/5 phase=dspark-greffe-code-c1 conc=1
+{"tok_s": 267.2594542003933, "ttft_s": 0.16248641099809902, "completion_tokens": 95, "aggregate_tok_s": null, "finish_reason": "stop", "nan": false, "accept_ratio": 0.7048, "accepted_per_step": 3.524, "mean_draft_tokens_per_step": 5.0, "pos": [0.9048, 0.8571, 0.6667, 0.619, 0.4762, 0.0, 0.0]}
+[bench] run 2/5 phase=dspark-greffe-code-c1 conc=1
+{"tok_s": 269.8299710640575, "ttft_s": 0.10367806800059043, "completion_tokens": 95, "aggregate_tok_s": null, "finish_reason": "stop", "nan": false, "accept_ratio": 0.7048, "accepted_per_step": 3.524, "mean_draft_tokens_per_step": 5.0, "pos": [0.9048, 0.8571, 0.6667, 0.619, 0.4762, 0.0, 0.0]}
+[bench] run 3/5 phase=dspark-greffe-code-c1 conc=1
+{"tok_s": 266.15787172979844, "ttft_s": 0.1549783260015829, "completion_tokens": 95, "aggregate_tok_s": null, "finish_reason": "stop", "nan": false, "accept_ratio": 0.7048, "accepted_per_step": 3.524, "mean_draft_tokens_per_step": 5.0, "pos": [0.9048, 0.8571, 0.6667, 0.619, 0.4762, 0.0, 0.0]}
+[bench] run 4/5 phase=dspark-greffe-code-c1 conc=1
+{"tok_s": 266.4739579937863, "ttft_s": 0.10066381700016791, "completion_tokens": 95, "aggregate_tok_s": null, "finish_reason": "stop", "nan": false, "accept_ratio": 0.7048, "accepted_per_step": 3.524, "mean_draft_tokens_per_step": 5.0, "pos": [0.9048, 0.8571, 0.6667, 0.619, 0.4762, 0.0, 0.0]}
+[bench] run 5/5 phase=dspark-greffe-code-c1 conc=1
+{"tok_s": 268.3074247984513, "ttft_s": 0.10618812300162972, "completion_tokens": 95, "aggregate_tok_s": null, "finish_reason": "stop", "nan": false, "accept_ratio": 0.7048, "accepted_per_step": 3.524, "mean_draft_tokens_per_step": 5.0, "pos": [0.9048, 0.8571, 0.6667, 0.619, 0.4762, 0.0, 0.0]}
+{
+  "phase": "dspark-greffe-code-c1",
+  "health_code": 200,
+  "health_body": "",
+  "ts": 1793046735.02479,
+  "prompt": "coding-clamp-range",
+  "thinking": false,
+  "temperature": 0,
+  "concurrency": 1,
+  "note": "decode_ms_per_draft_step is a serving-cycle ratio, not a kernel timing",
+  "warmup": {
+    "tok_s": 256.72847017946634,
+    "ttft_s": 0.4044654469980742,
+    "completion_tokens": 32
+  },
+  "tok_s_median": 267.2594542003933,
+  "tok_s_min": 266.15787172979844,
+  "tok_s_max": 269.8299710640575,
+  "ttft_median_s": 0.10618812300162972,
+  "completion_tokens_median": 95.0,
+  "accept_ratio_median": 0.7048,
+  "accepted_per_step_median": 3.524,
+  "mean_draft_tokens_per_step_median": 5.0,
+  "aggregate_tok_s_median": null,
+  "decode_ms_per_draft_step_median": 16.748483190548583,
+  "any_nan": false,
+  "health_code_after": 200
+}
+wrote /opt/dsv41-gnmac/bench/out/dspark-greffe-code-c1.json
+[bench] warmup (32 tokens)
+{"tok_s": 259.2260603621099, "ttft_s": 0.12663707899992005, "completion_tokens": 32}
+[bench] run 1/3 phase=dspark-greffe-code-c8 conc=8
+{"tok_s": 90.09915907878008, "ttft_s": 1.6964474670003256, "completion_tokens": 760, "aggregate_tok_s": 277.1102018806006, "finish_reason": ["stop", "stop", "stop", "stop", "stop", "stop", "stop", "stop"], "nan": false, "accept_ratio": 0.7102, "accepted_per_step": 3.551, "mean_draft_tokens_per_step": 5.0, "pos": [0.8802, 0.8323, 0.6766, 0.6527, 0.509, 0.0, 0.0]}
+[bench] run 2/3 phase=dspark-greffe-code-c8 conc=8
+{"tok_s": 93.9584178491705, "ttft_s": 0.6844230009992316, "completion_tokens": 760, "aggregate_tok_s": 450.29751156658267, "finish_reason": ["stop", "stop", "stop", "stop", "stop", "stop", "stop", "stop"], "nan": false, "accept_ratio": 0.7102, "accepted_per_step": 3.551, "mean_draft_tokens_per_step": 5.0, "pos": [0.8743, 0.8263, 0.6766, 0.6587, 0.515, 0.0, 0.0]}
+[bench] run 3/3 phase=dspark-greffe-code-c8 conc=8
+{"tok_s": 84.84352801528425, "ttft_s": 0.31958913800008304, "completion_tokens": 760, "aggregate_tok_s": 495.10343355644375, "finish_reason": ["stop", "stop", "stop", "stop", "stop", "stop", "stop", "stop"], "nan": false, "accept_ratio": 0.7157, "accepted_per_step": 3.578, "mean_draft_tokens_per_step": 5.0, "pos": [0.8976, 0.8554, 0.6928, 0.6386, 0.494, 0.0, 0.0]}
+{
+  "phase": "dspark-greffe-code-c8",
+  "health_code": 200,
+  "health_body": "",
+  "ts": 1793046738.1843135,
+  "prompt": "coding-clamp-range",
+  "thinking": false,
+  "temperature": 0,
+  "concurrency": 8,
+  "note": "decode_ms_per_draft_step is a serving-cycle ratio, not a kernel timing",
+  "warmup": {
+    "tok_s": 259.2260603621099,
+    "ttft_s": 0.12663707899992005,
+    "completion_tokens": 32
+  },
+  "tok_s_median": 90.09915907878008,
+  "tok_s_min": 84.84352801528425,
+  "tok_s_max": 93.9584178491705,
+  "ttft_median_s": 0.6844230009992316,
+  "completion_tokens_median": 760.0,
+  "accept_ratio_median": 0.7102,
+  "accepted_per_step_median": 3.551,
+  "mean_draft_tokens_per_step_median": 5.0,
+  "aggregate_tok_s_median": 450.29751156658267,
+  "decode_ms_per_draft_step_median": 6.247275332345757,
+  "any_nan": false,
+  "health_code_after": 200
+}
+wrote /opt/dsv41-gnmac/bench/out/dspark-greffe-code-c8.json
+[bench] run 1/5 phase=dspark-greffe-prose-c1 conc=1
+{"tok_s": 200.0998086814344, "ttft_s": 0.14300754900250467, "completion_tokens": 400, "aggregate_tok_s": null, "finish_reason": "length", "nan": false, "accept_ratio": 0.4769, "accepted_per_step": 2.306, "mean_draft_tokens_per_step": 4.835, "pos": [0.8182, 0.6612, 0.4463, 0.2149, 0.1653, 0.0, 0.0]}
+[bench] run 2/5 phase=dspark-greffe-prose-c1 conc=1
+{"tok_s": 212.101433803582, "ttft_s": 0.14225706300203456, "completion_tokens": 400, "aggregate_tok_s": null, "finish_reason": "length", "nan": false, "accept_ratio": 0.4763, "accepted_per_step": 2.381, "mean_draft_tokens_per_step": 5.0, "pos": [0.8475, 0.678, 0.4068, 0.2712, 0.178, 0.0, 0.0]}
+[bench] run 3/5 phase=dspark-greffe-prose-c1 conc=1
+{"tok_s": 196.61805997183828, "ttft_s": 0.1573649120000482, "completion_tokens": 400, "aggregate_tok_s": null, "finish_reason": "length", "nan": false, "accept_ratio": 0.4225, "accepted_per_step": 2.093, "mean_draft_tokens_per_step": 4.953, "pos": [0.7829, 0.5814, 0.3953, 0.2093, 0.124, 0.0, 0.0]}
+[bench] run 4/5 phase=dspark-greffe-prose-c1 conc=1
+{"tok_s": 201.3410658269251, "ttft_s": 0.10415494600238162, "completion_tokens": 400, "aggregate_tok_s": null, "finish_reason": "length", "nan": false, "accept_ratio": 0.4333, "accepted_per_step": 2.167, "mean_draft_tokens_per_step": 5.0, "pos": [0.8175, 0.5714, 0.3968, 0.2619, 0.119, 0.0, 0.0]}
+[bench] run 5/5 phase=dspark-greffe-prose-c1 conc=1
+{"tok_s": 194.26459065110782, "ttft_s": 0.10551931700319983, "completion_tokens": 400, "aggregate_tok_s": null, "finish_reason": "length", "nan": false, "accept_ratio": 0.4129, "accepted_per_step": 2.046, "mean_draft_tokens_per_step": 4.954, "pos": [0.8168, 0.5496, 0.374, 0.2061, 0.0992, 0.0, 0.0]}
+{
+  "phase": "dspark-greffe-prose-c1",
+  "health_code": 200,
+  "health_body": "",
+  "ts": 1793046745.4722939,
+  "prompt": "hashmap-prose",
+  "thinking": false,
+  "temperature": 0,
+  "concurrency": 1,
+  "note": "decode_ms_per_draft_step is a serving-cycle ratio, not a kernel timing",
+  "tok_s_median": 200.0998086814344,
+  "tok_s_min": 194.26459065110782,
+  "tok_s_max": 212.101433803582,
+  "ttft_median_s": 0.14225706300203456,
+  "completion_tokens_median": 400.0,
+  "accept_ratio_median": 0.4333,
+  "accepted_per_step_median": 2.167,
+  "mean_draft_tokens_per_step_median": 4.954,
+  "aggregate_tok_s_median": null,
+  "decode_ms_per_draft_step_median": 15.731124883731276,
+  "any_nan": false,
+  "health_code_after": 200
+}
+wrote /opt/dsv41-gnmac/bench/out/dspark-greffe-prose-c1.json
+[bench] warmup (32 tokens)
+{"tok_s": 213.30071126232323, "ttft_s": 0.11629543199887848, "completion_tokens": 32}
+[bench] run 1/3 phase=dspark-greffe-prose-c8 conc=8
+{"tok_s": 59.746319818597435, "ttft_s": 0.5964741370007687, "completion_tokens": 3200, "aggregate_tok_s": 437.8320839373724, "finish_reason": ["length", "length", "length", "length", "length", "length", "length", "length"], "nan": false, "accept_ratio": 0.5276, "accepted_per_step": 1.86, "mean_draft_tokens_per_step": 3.525, "pos": [0.7911, 0.5875, 0.3857, 0.0598, 0.0357, 0.0, 0.0]}
+[bench] run 2/3 phase=dspark-greffe-prose-c8 conc=8
+{"tok_s": 60.52613442794329, "ttft_s": 0.8899656939993292, "completion_tokens": 3200, "aggregate_tok_s": 421.2626235692294, "finish_reason": ["length", "length", "length", "length", "length", "length", "length", "length"], "nan": false, "accept_ratio": 0.4935, "accepted_per_step": 1.902, "mean_draft_tokens_per_step": 3.854, "pos": [0.7724, 0.5712, 0.398, 0.1061, 0.0544, 0.0, 0.0]}
+[bench] run 3/3 phase=dspark-greffe-prose-c8 conc=8
+{"tok_s": 62.01718139609908, "ttft_s": 0.28056898599970737, "completion_tokens": 3200, "aggregate_tok_s": 465.1086957699493, "finish_reason": ["length", "length", "length", "length", "length", "length", "length", "length"], "nan": false, "accept_ratio": 0.5305, "accepted_per_step": 1.984, "mean_draft_tokens_per_step": 3.74, "pos": [0.8108, 0.6011, 0.4129, 0.1072, 0.0522, 0.0, 0.0]}
+{
+  "phase": "dspark-greffe-prose-c8",
+  "health_code": 200,
+  "health_body": "",
+  "ts": 1793046756.2805486,
+  "prompt": "hashmap-prose",
+  "thinking": false,
+  "temperature": 0,
+  "concurrency": 8,
+  "note": "decode_ms_per_draft_step is a serving-cycle ratio, not a kernel timing",
+  "warmup": {
+    "tok_s": 213.30071126232323,
+    "ttft_s": 0.11629543199887848,
+    "completion_tokens": 32
+  },
+  "tok_s_median": 60.52613442794329,
+  "tok_s_min": 59.746319818597435,
+  "tok_s_max": 62.01718139609908,
+  "ttft_median_s": 0.5964741370007687,
+  "completion_tokens_median": 3200.0,
+  "accept_ratio_median": 0.5276,
+  "accepted_per_step_median": 1.902,
+  "mean_draft_tokens_per_step_median": 3.74,
+  "aggregate_tok_s_median": 437.8320839373724,
+  "decode_ms_per_draft_step_median": 5.9769141681760996,
+  "any_nan": false,
+  "health_code_after": 200
+}
+wrote /opt/dsv41-gnmac/bench/out/dspark-greffe-prose-c8.json
+
+| dspark-greffe | structured | code | prose |
+|---|---:|---:|---:|
+| 1 user, streaming | 369.8 | 267.3 | 200.1 |
+| 8 users, aggregate | 852.9 | 450.3 | 437.8 |
+MIA dspark-greffe {"structured 1u": 369.8, "structured 8u": 852.9, "code 1u": 267.3, "code 8u": 450.3, "prose 1u": 200.1, "prose 8u": 437.8}
