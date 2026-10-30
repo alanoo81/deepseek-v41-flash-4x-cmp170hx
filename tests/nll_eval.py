@@ -115,7 +115,8 @@ class Api:
     def _req(self, path, body=None, tries=3):
         data = None if body is None else json.dumps(body).encode()
         for i in range(tries):
-            req = urllib.request.Request(self.base + path, data, {"Content-Type": "application/json"})
+            req = urllib.request.Request(self.base + path, data, {"Content-Type": "application/json",
+                                         **({"Authorization": "Bearer " + os.environ["NLL_API_KEY"]} if os.environ.get("NLL_API_KEY") else {})})
             try:
                 with urllib.request.urlopen(req, timeout=self.timeout) as r:
                     return json.loads(r.read())

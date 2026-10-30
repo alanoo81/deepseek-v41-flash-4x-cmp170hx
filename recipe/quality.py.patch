@@ -1,0 +1,12 @@
+--- a/bench/quality.py
++++ b/bench/quality.py
+@@ -56,7 +56,8 @@
+     body = {"model": model, "temperature": 0, "max_tokens": max_tokens,
+             "messages": [{"role": "user", "content": prompt}]}
+     req = urllib.request.Request(base + "/v1/chat/completions", json.dumps(body).encode(),
+-                                 {"Content-Type": "application/json"})
++                                 {"Content-Type": "application/json",
++                                  **({"Authorization": "Bearer " + os.environ["QUALITY_API_KEY"]} if os.environ.get("QUALITY_API_KEY") else {})})
+     r = json.load(urllib.request.urlopen(req, timeout=3600))
+     ch = r["choices"][0]
+     return ch["message"].get("content") or "", ch.get("finish_reason")

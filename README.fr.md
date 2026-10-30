@@ -49,7 +49,7 @@ Le dépôt ne contient que des patchs, des scripts, des tests et des données br
 - [`docs/quality-research.md`](docs/quality-research.md) : la recherche sur la qualité.
 - [`docs/agentic-methodology.md`](docs/agentic-methodology.md) : comment la recherche a été menée, avec des workflows d'agents IA (Claude Code), une relecture critique et les décisions laissées à l'humain, ainsi que nos règles de mesure.
 - [`docs/results.md`](docs/results.md) : toutes les mesures.
-- [`docs/comparison-morrowmake.md`](docs/comparison-morrowmake.md) : la comparaison avec la recette Morrowmake.
+- [`docs/comparison-morrowmake.md`](docs/comparison-morrowmake.md) : la comparaison avec la recette Morrowmake, **dont une mesure A-B-A sur la même machine (30/10/2026)**. Sur des fenêtres jusqu'à 1 024 jetons, les deux moteurs font jeu égal à poids identiques (moins de 0,3 % de perplexité d'écart) ; notre configuration est meilleure d'environ 2 % (5 % en français) grâce à ses couches 18-22 en 3 bits. HumanEval et GSM8K ne départagent pas les deux piles. Le contrôle P2P de Morrowmake passe sur notre pilote sans son patch TRAP31. Vitesse et contextes longs non comparés sur une même machine.
 
 ## Organisation du dépôt
 
