@@ -221,9 +221,10 @@ Usable memory is 64,911 MiB per card.
 | `dspark` 0.97 | 2 | 800,134 / 800,136 | 1,836 / 1,631 | 391 / 390 s | 16/16 OK | 63,652 / 63,808 / 63,798 / 63,768 | about 1.1 GiB | `data/logs/07-dspark-stress-vram.txt` |
 | `k3` 0.98 | 1 | 800,134 | 1,937 | 388 s | 8/8 OK | 63,580 / 63,574 / 63,566 / 63,556 | about 1.3 GiB | `data/logs/08-ceiling-0.98-smoke-stress-nll.txt` |
 | `k3` 0.98, NLL with `prompt_logprobs` (1,024-token windows) | | | | | no OOM | 64,540 / 64,534 / 64,546 / 64,676 | **about 0.23 GiB** | `data/logs/08-ceiling-0.98-smoke-stress-nll.txt` |
+| `k3` 0.98, `prompt_logprobs` on a 2,001-token prompt (self-check canary, 2026-10-30) | | | | | **CUDA OOM on GPU 0, engine dead** (about 1 GiB requested) | | none | [comparison-morrowmake.md, 0.7](comparison-morrowmake.md#07-side-finding-prompt_logprobs-can-crash-our-production-configuration) |
 
 - Under DSpark, the peak during the decode benchmarks was the same as during the stress run (63.8 GB). The peak is reached quickly and depends little on the load (notes).
-- `prompt_logprobs` allocates a logits buffer that the startup memory profile does not count. That is why the NLL run comes so close to the limit at 0.98. Use 0.97 or windows of 512 tokens or fewer for scoring.
+- `prompt_logprobs` allocates a logits buffer that the startup memory profile does not count. That is why the NLL run comes so close to the limit at 0.98, and why a 2,001-token request killed the engine. Use 0.97 or windows of 1,024 tokens or fewer for scoring. The server has no restart policy: after such a crash it stays down.
 
 ## 7. Copy tests and determinism
 
@@ -377,9 +378,9 @@ We have been caught before by benchmarks that gave plausible but wrong numbers. 
 ## 10. What we did not measure
 
 - KL or perplexity against the original unquantized model, or against DeepSeek's reference implementation.
-- HumanEval, GSM8K or other task accuracy. Upstream reports 154/164 and 1,275/1,319 for its 1.2.0 release; we did not rerun them.
+- Other task accuracy than HumanEval and GSM8K (measured on 2026-10-30, [comparison-morrowmake.md, 0.4](comparison-morrowmake.md#04-humaneval-and-gsm8k): 157-158/164 and 1,277-1,280/1,319 over two runs).
 - Engram read from NVMe (`ssd` mode without the tmpfs) on our machine.
 - Context lengths above 262,144 tokens, the `pp4` layout, and needle-in-a-haystack retrieval.
 - Long agentic sessions with tool calls under load. The smoke test checks a single tool call.
 - Thermal behaviour under sustained load.
-- Morrowmake's recipe on the same machine (see [comparison-morrowmake.md](comparison-morrowmake.md)).
+- Morrowmake's speed and long-context quality on the same machine. Its short-context quality was measured on 2026-10-30 ([comparison-morrowmake.md, section 0](comparison-morrowmake.md#0-same-machine-measurement-2026-10-30)).

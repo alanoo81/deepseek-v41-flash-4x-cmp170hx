@@ -7,17 +7,96 @@ Two public recipes serve DeepSeek-V4.1-Flash-1017 on 4x CMP 170HX:
 
 This page compares Morrowmake's recipe with our configuration (GNmac plus the changes in this repository). We set out to use Morrowmake's recipe, and switched to GNmac's mainly because Morrowmake's download did not fit on our disk.
 
-**What this comparison is and is not.** We did **not** run Morrowmake's recipe. Everything about it below comes from its source, its documentation and its published results, which we read in a read-only research pass. A second, critical pass then re-checked the claims, and it corrected several, for example that Morrowmake's `bfloat16` KV cache is "not quantized" (it holds the reference's exact rounded values).
+**What this comparison is and is not.** The first version of this page (2026-10-27) was written without running Morrowmake's recipe: everything about it came from its source, its documentation and its published results, read in a research pass and re-checked by a second, critical pass. On **2026-10-30 we ran Morrowmake 1.0.0 on our machine** and measured both stacks with the same tools, on the same frozen token windows, in A-B-A order. Those results are in [section 0](#0-same-machine-measurement-2026-10-30) and they replace the inferences they cover. The rest of the page still mixes our measurements with Morrowmake's published figures where we did not re-measure (speed in particular); those places say so.
 
-Our own numbers come from measurements on our machine ([results.md](results.md)). No number in this page comes from running both stacks on the same machine. Read it as a map of the differences, not as a benchmark.
+## 0. Same-machine measurement (2026-10-30)
+
+**Short version.** On windows of up to 1,024 tokens, the two *engines* score the same within about 0.3 % perplexity. Our configuration is better by about 2 % perplexity (5 % on French) because of its **weights** (layers 18-22 grafted to 3 bits), not because of its engine. HumanEval and GSM8K cannot separate the two stacks: the gap is the size of our own run-to-run noise. Long contexts and speed were **not** measured.
+
+### 0.1 Setup
+
+- **One machine, one driver, one power setting** for both stacks: 4x CMP 170HX at 200 W with the same clock profile, our driver (cmpunlocker fork with a P2P patch, **without TRAP31**), EPYC 7F52, 512 GB of RAM.
+- **Morrowmake 1.0.0** at `7f9023c`, image `ghcr.io/morrowmake/vllm-cmp170hx@sha256:f67d9be4…`, weights at its pinned revisions, its hybrid checkpoint as built and hash-checked by its own `prepare.sh`. Defaults everywhere except: **drafter off** (`EXTRA_ARGS=--speculative-config null`, to match our production), port and listen address, and the launch changes in [0.6](#06-running-morrowmake-on-this-machine). Engram tables in RAM (`auto` chose RAM), utilisation 0.95 (its default).
+- **Ours**: this repository's production configuration (`k3`: layers 18-22 at 3 bits, `fp8_ds_mla`, no drafter, Engram from a tmpfs, utilisation 0.98).
+- **Order**: ours (A1), Morrowmake (B), ours again (A2), each with a fresh server. Only one stack runs at a time: each one uses all four cards.
+- **Tools**: [`tests/nll_eval.py`](../tests/nll_eval.py) on the frozen windows of [results.md, section 8](results.md#8-nll--perplexity) (64 x 1,024 tokens and 400 x 40 tokens per corpus, French, English and code), with top-20 logprobs for a KL bound; its `selfcheck`; GNmac's `bench/quality.py` for HumanEval (164) and GSM8K (1,319), at temperature 0, 8 requests at a time. The 2-line patch that lets `quality.py` send an API key is [`recipe/quality.py.patch`](../recipe/quality.py.patch).
+- **Files**: `data/nll/{ours-A1,ours-A2,morrowmake-B}{,-short}.json`, `data/nll/sc-*.json`, `data/quality/*.json`. Per-token top-20 lists were stripped from the published run files for size; the KL figures below were computed before stripping.
+
+### 0.2 Our side did not move
+
+- `ours-A1` and `ours-A2` are **bit-identical** on every long and short window, and both are bit-identical to `k3-098`, measured three days earlier. Every comparison below therefore has a zero noise floor on our side.
+- Morrowmake was also bit-identical on repeated requests within its run (`repeat` field: max |d mean NLL| 0). It ran once, so its cross-restart reproducibility was not tested.
+
+### 0.3 Perplexity (teacher forcing, prefill path)
+
+Long windows (1,024 tokens), d = B - A, negative means B predicts the text better:
+
+| Pair | French | English | Code | **All** (192) | B better / worse |
+|---|---|---|---|---|---|
+| **Our production (`ours-A1`) → Morrowmake** | +4.99 % [+4.43, +5.57] | +0.81 % [+0.48, +1.15] | +0.23 % [+0.03, +0.43] | **+1.99 % [+1.76, +2.21]** | 43 / 149 |
+| **Same weights: our engine with the 2.9 pack (`k29`) → Morrowmake** | +0.32 % [+0.03, +0.61] | +0.10 % [-0.13, +0.32] | +0.04 % [-0.13, +0.22] | **+0.15 % [+0.02, +0.29]** | 83 / 109 |
+| For reference, same engine: `k29` → `k3` (the graft) | -4.45 % | -0.70 % | -0.18 % | -1.80 % [-2.00, -1.60] | 150 / 42 |
+
+Short windows (40 tokens): our production → Morrowmake +0.29 % [-0.16, +0.73]; `k29` → Morrowmake -0.29 % [-0.59, +0.02]. Neither is resolved.
+
+KL lower bound from the top-20 lists, our production vs Morrowmake, long windows: French 0.110, English 0.025, code 0.016 nats/token; argmax agreement 91.1 %, 97.7 % and 95.5 %. Most of it is the weight difference (the 2-bit layers), as the `k29` row shows.
+
+**Reading.**
+
+- The quality gap between the two complete stacks is the weights. Morrowmake ships LibertAI's 2.9 bpw pack as published, with layers 18-22 at 2 bits; we graft those five layers from the 3.5 bpw pack.
+- With the same weights, Morrowmake's engine is **not** better on these windows: +0.15 % on long windows (slightly worse, at the edge of significance: Wilcoxon p 0.017, sign test p 0.07) and -0.29 % on short ones (not resolved). Its more faithful KV and indexer rounding (section [1.1](#11-where-morrowmake-is-likely-closer-to-the-original-kv-and-indexer-rounding)) does not show up at this length.
+- **The `k29` row compares a run from 2026-10-26 with one from 2026-10-30.** That is valid here because our stack reproduced `k3` bit for bit across those days (0.2), but it is not an A-B-A on that pair.
+- **Limit of this test:** 1,024 tokens at most. The rounding of the sliding-window cache, of the compressed cache and of the indexer should matter more as the context grows. A long-context measurement (32k tokens and more) is the test that could still favour Morrowmake; we have not run it.
+
+### 0.4 HumanEval and GSM8K
+
+| | Ours A1 | Ours A2 | Morrowmake B |
+|---|---:|---:|---:|
+| HumanEval /164 | 157 | 158 | 153 |
+| GSM8K /1,319 | 1,277 | 1,280 | 1,271 |
+| Replies cut by the token limit (HumanEval / GSM8K) | 3 / 7 | 3 / 6 | 9 / 14 |
+
+- **Our two runs of the same server differ** on 1 HumanEval problem and on **11 GSM8K problems**. Generation at temperature 0 is not bit-deterministic when 8 requests share batches.
+- A1 against Morrowmake: 5 vs 1 discordant problems on HumanEval (exact McNemar p 0.22), 8 vs 2 on GSM8K (p 0.11). That is no more than the A1/A2 disagreement.
+- **Conclusion: these two benchmarks do not separate the stacks.** Morrowmake's answers hit the reply limit more often, which suggests slightly longer reasoning; we did not investigate further.
+- For scale, Morrowmake publishes 157/164 and 1,280/1,319 on its own machine, and GNmac 154/164 and 1,275/1,319.
+
+### 0.5 Decode/prefill self-check
+
+`nll_eval.py selfcheck`: 12 greedy continuations of 64 tokens are rescored by teacher forcing, which compares the decode path with the prefill path of the same server. The causality canary was shortened to a 500-token block (see 0.7).
+
+| | Mean \|decode - prefill\| logprob | p99 | Prefill argmax ≠ generated token | Canary, first / second copy NLL |
+|---|---:|---:|---:|---|
+| Ours A1 | 0.0205 | 0.32 | 1.2 % | 13.62 / 0.072 |
+| Ours A2 | 0.0185 | 0.26 | 2.2 % | 13.62 / 0.072 |
+| Morrowmake B | **0.0476** | 0.59 | **3.9 %** | 13.51 / 0.073 |
+
+- Both canaries are healthy: the first copy stays at its causal NLL.
+- Morrowmake's decode and prefill paths disagree about twice as much as ours. This measures internal consistency only: it does not say which path is closer to the original model.
+
+### 0.6 Running Morrowmake on this machine
+
+What it took, for anyone repeating this:
+
+- **Disk**: its downloads land in one directory of about 672 GiB. We put them on a separate ZFS dataset with a quota. Shards we already had (the LibertAI 2.9 pack and the official shards 47-48) were copied in first: `hf download` checks the SHA-256 of files already present and kept all of them, so only about 285 GiB were downloaded.
+- **Disk check**: `start.sh`'s preflight compares free space with 680 GiB and ignores what is already downloaded (`docker/prepare.sh` does count it). With partial copies in place we ran `NEED_DISK_GB=300 ./start.sh download`.
+- **`config.json` never downloaded**: with the image's `hf` 1.33, `--include` takes a single value, so the first file of the pattern list (`config.json`) is taken as the pattern and the others as explicit file names. The check then reports the checkpoint as incomplete. We fetched both `config.json` files at the pinned revisions by hand.
+- **GPU access**: Docker in our LXC container has no `nvidia` runtime, so `--gpus all` does not work. We changed that one argument in `start.sh` to `--device nvidia.com/gpu=all` (CDI), as our own stack does. It does not touch the engine.
+- **P2P**: its content check **passed on all 12 ordered pairs with our driver, which has no TRAP31 patch**, and it started with P2P and its custom all-reduce on.
+- **First start**: 17 min to healthy, then its boot check passed.
+- **KV pool without the drafter, utilisation 0.95: 2,154,551 tokens** (8.22 full-length sequences).
+
+### 0.7 Side finding: `prompt_logprobs` can crash our production configuration
+
+During this run, our server at utilisation 0.98 died with `CUDA out of memory` (about 1 GiB requested on card 0) on the self-check's canary, a 2,001-token prompt with `prompt_logprobs`. vLLM computes full-vocabulary logprobs for every prompt position, about 1 GB for 2,000 tokens, and 0.98 leaves about that much free per card. 1,024-token windows were fine. The engine stopped and, without a restart policy, stayed down. **If clients may send `prompt_logprobs` on long prompts, use 0.97 or less**; this is why the canary above was shortened to 500 tokens.
 
 ## Summary
 
 | | Morrowmake 1.0.0 | Ours (GNmac 1.2.0 + this repo) | Which side it favours |
 |---|---|---|---|
-| Routed experts | LibertAI EXL3 2.9 bpw: layers 18-22 at 2 bits, the rest at 3 bits | Same pack, but layers 18-22 grafted to 3 bits from the 3.5 bpw pack | **Ours: measured** -1.80 % perplexity overall and -4.45 % on French |
-| KV cache | `bfloat16` rows holding the reference's exact quantize-dequantize values | `fp8_ds_mla` in the V4 record on sm_80. Coarser than the reference on the window, finer elsewhere | **Morrowmake, likely**; not measured by anyone |
-| Indexer | Reference rounding reproduced (FP4 queries and keys, BF16 score rounding, canonical tie-breaking) | FP8 index keys, one fp32 scale per token | Morrowmake, likely; not measured |
+| Routed experts | LibertAI EXL3 2.9 bpw: layers 18-22 at 2 bits, the rest at 3 bits | Same pack, but layers 18-22 grafted to 3 bits from the 3.5 bpw pack | **Ours: measured** -1.80 % perplexity overall and -4.45 % on French. Whole stacks on one machine: Morrowmake +1.99 % ([0.3](#03-perplexity-teacher-forcing-prefill-path)) |
+| KV cache | `bfloat16` rows holding the reference's exact quantize-dequantize values | `fp8_ds_mla` in the V4 record on sm_80. Coarser than the reference on the window, finer elsewhere | **No measurable difference at ≤1,024 tokens** (same-weights engine gap +0.15 %, [0.3](#03-perplexity-teacher-forcing-prefill-path)); long contexts not measured |
+| Indexer | Reference rounding reproduced (FP4 queries and keys, BF16 score rounding, canonical tie-breaking) | FP8 index keys, one fp32 scale per token | Same as the KV row: no difference at ≤1,024 tokens; long contexts not measured |
 | All-reduce | Decode: FP32, rounded once. Prefill MoE: BF16 at each ring hop (a switch makes it exact; not in the measured config) | Decode: BF16 adds in a ring (up to 3 roundings). Prefill: FP32, rounded once | Mixed; small |
 | Dense FP8 matmuls | W8A16 (activations not quantized, unlike the reference) | Same | Equivalent |
 | Engram | Exact dequantization, matches the reference bit for bit | Same | Equivalent |
@@ -25,9 +104,9 @@ Our own numbers come from measurements on our machine ([results.md](results.md))
 | Speculative decoding | DSpark, up to 7 drafts, adaptive | Off (lossless either way; off for KV room) | Equivalent for quality |
 | Verification approach | Per-module bit-exact tests against DeepSeek's own reference code; HumanEval/GSM8K against its own all-switches-off build | Paired NLL A/B between weight configurations, A-B-A across restarts; copy and determinism tests | Different strengths. Neither stack was ever compared with the unquantized model |
 | Cold prefill (published / ours) | 3,818 tok/s (2,048 tokens), 3,808 (32,768 tokens) | 2,514 tok/s (24-38k tokens) | **Morrowmake, about 1.5x** (different machines and methods) |
-| KV pool at 262k | 1,247,406 tokens (with drafter, 0.95) | 2,717,420 tokens (no drafter, 0.98) | Ours, through configuration choices, not the engine |
+| KV pool at 262k | 1,247,406 tokens (with drafter, 0.95); **2,154,551 without drafter** (measured here, 0.95) | 2,717,420 tokens (no drafter, 0.98) | Ours, through configuration choices, not the engine |
 | Disk | 671.5 GiB of downloads, 680 GiB required by its preflight check | about 428 GiB | Ours |
-| P2P | Requires a driver build that passes its own content check. Its docs name a TRAP31 patch | Works with our driver, which has no TRAP31 patch | Untested for Morrowmake on our driver |
+| P2P | Requires a driver build that passes its own content check. Its docs name a TRAP31 patch | Works with our driver, which has no TRAP31 patch | **Morrowmake's content check passes on our driver too** (no TRAP31), [0.6](#06-running-morrowmake-on-this-machine) |
 
 ## 1. Quality
 
@@ -101,11 +180,11 @@ For scale: the llama.cpp DeepSeek-V4.1 pull request (#30817) reports that DeepSe
 
 ### 1.6 Quality verdict
 
-- **KV and indexer rounding fidelity likely favour Morrowmake.** Inferred from code, not measured.
-- **Layers 18-22 favour us**, and that difference is measured and large on French.
+- **KV and indexer rounding fidelity favour Morrowmake on paper, but the same-machine measurement does not show it** on windows of up to 1,024 tokens ([0.3](#03-perplexity-teacher-forcing-prefill-path)). Long contexts remain untested.
+- **Layers 18-22 favour us**, measured twice, and large on French.
 - **Everything else is equivalent or close to it.**
 
-We cannot say which complete stack is closer to the original model. That would take the experiment in [section 5](#5-what-a-fair-same-machine-ab-would-need).
+We still cannot say which complete stack is closer to the original model: that needs reference logits ([section 5](#5-what-a-fair-same-machine-ab-would-need), item 7).
 
 ## 2. Performance
 
@@ -161,7 +240,7 @@ Our larger pool comes from configuration choices that cost something else:
 - no drafter: +2.78 GiB per card of KV, paid for with single-user speed;
 - utilisation 0.98: a thin margin when using `prompt_logprobs`.
 
-The graft goes the other way: it uses 1.98 GiB per card more than the published pack. Morrowmake's `bfloat16` KV takes more memory per token than `fp8_ds_mla`. Morrowmake can turn its drafter off (`EXTRA_ARGS="--speculative-config None"`), but we do not know what pool that gives.
+The graft goes the other way: it uses 1.98 GiB per card more than the published pack. Morrowmake's `bfloat16` KV takes more memory per token than `fp8_ds_mla`. With its drafter off (`EXTRA_ARGS=--speculative-config null`) at its default 0.95, Morrowmake gave **2,154,551 tokens** on our machine.
 
 ## 3. Disk, RAM and installation
 
@@ -193,9 +272,11 @@ Our driver is a cmpunlocker fork with a P2P patch, **without** TRAP31. On it:
 - NCCL passes on all four cards;
 - GNmac's stack runs with `NCCL_P2P_LEVEL=SYS` and FlashInfer's PCIe IPC all-reduce.
 
-Morrowmake's own documentation warns that a topology report is not a data-integrity test. We do not know whether our driver passes Morrowmake's content check. Do not use `P2P=force` to skip that check: Morrowmake documents that it may hang or corrupt data.
+Morrowmake's own documentation warns that a topology report is not a data-integrity test. **On 2026-10-30 our driver passed Morrowmake's content check** on all 12 ordered pairs, without TRAP31, and Morrowmake ran with P2P on. That is one boot on one machine. Do not use `P2P=force` to skip the check: Morrowmake documents that it may hang or corrupt data.
 
 ## 5. What a fair same-machine A/B would need
+
+Status on 2026-10-30: items 1, 2 and 5 (drafter off) are done, item 6 has three of its four cells (`k29`, `k3`, Morrowmake as shipped), and from item 8 the self-check, HumanEval and GSM8K were run ([section 0](#0-same-machine-measurement-2026-10-30)). Speed (item 4), the Morrowmake graft cell, the round-once all-reduce arm, long contexts, tool calling and an external reference (item 7) remain.
 
 1. **Disk for both, or a careful sequence.**
    - Separately, the two need about 1.1 TB.
