@@ -1,6 +1,8 @@
 # Fidelity research: getting as close as possible to the original DeepSeek-V4.1-Flash on 4x CMP 170HX
 
-This document covers the quality side of the project, in the order it happened. It explains which quantized setup we chose and why, how we checked that the deployment really runs the model we think it runs, and what we measured. It also covers what we got wrong. Speed numbers appear only where they bear on a fidelity decision; see [`results.md`](results.md) for the full set. The research process itself (parallel read-only agent workflows with a critic pass) is described in [`agentic-methodology.md`](agentic-methodology.md).
+> **Second round (2026-10-31).** The graft chosen here also works in Morrowmake's engine (-1.81 %), which we now serve; 4-bit experts were tested again on layers 36-39 (-0.11 % on long contexts). See [results.md](results.md).
+
+This document covers the quality side of the project, in the order it happened. It explains which quantized setup we chose and why, how we checked that the deployment really runs the model we think it runs, and what we measured. It also covers what we got wrong. Speed numbers appear only where they bear on a fidelity decision; see [`results-gnmac.md`](results-gnmac.md) for the full set. The research process itself (parallel read-only agent workflows with a critic pass) is described in [`agentic-methodology.md`](agentic-methodology.md).
 
 Conventions used throughout:
 
@@ -311,7 +313,7 @@ What this shows:
 
 - **The copy errors and the non-determinism both came from the empty tables.** In this test, the prefix-cache / Engram-history failure that the llama.cpp PR reports did not appear on this stack. Pass 2 and pass 3 reuse cached prefixes and stay exact.
 - **Reading Engram from RAM through `ssd` mode costs nothing measurable.** Single-user and prefill speed match the no-Engram run within a few percent.
-- **The code rows are not comparable.** The 8-user code figure is higher with Engram (482.4 against 375.9 tok/s), but the model wrote answers of different length in the two runs (median 95 completion tokens at 1 user with the tables, 121 without), so that difference is mostly a different amount of work per request, not a speed change. See [`results.md`, section 4.2](results.md#42-without-engram-tables-invalid-kept-for-the-record).
+- **The code rows are not comparable.** The 8-user code figure is higher with Engram (482.4 against 375.9 tok/s), but the model wrote answers of different length in the two runs (median 95 completion tokens at 1 user with the tables, 121 without), so that difference is mostly a different amount of work per request, not a speed change. See [`results.md`, section 4.2](results-gnmac.md#42-without-engram-tables-invalid-kept-for-the-record).
 
 **Our lesson:** the upstream benchmarks (decode speed, prefill, no NaNs) cannot detect this failure. A model with two layers silently disabled runs exactly as fast. An exact-copy test caught it, and a plausible-looking speed number did not. The `.env` and `serve.sh` comments now say: never leave `ENGRAM_STORAGE` empty on this stack.
 

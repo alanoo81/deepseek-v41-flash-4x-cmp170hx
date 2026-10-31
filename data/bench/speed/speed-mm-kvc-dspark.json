@@ -1,0 +1,65 @@
+{
+ "label": "mm-kvc-dspark",
+ "ts": 1793449546.5184302,
+ "c1-3k": {
+  "prompt_tokens": 3464,
+  "decode_median": 245.8724940854773,
+  "ttft_median": 1.0079783009859966,
+  "prefill_rate_median": 3436.5819151181545,
+  "gen": [
+   256,
+   256,
+   256
+  ]
+ },
+ "c1-32k": {
+  "prompt_tokens": 32855,
+  "decode_median": 124.15374343641764,
+  "ttft_median": 9.551368738000747,
+  "prefill_rate_median": 3439.716432398658,
+  "gen": [
+   186,
+   256,
+   256
+  ]
+ },
+ "c1-64k": {
+  "prompt_tokens": 65781,
+  "decode_median": 128.9612326876766,
+  "ttft_median": 21.09560940850497,
+  "prefill_rate_median": 3118.2334107281913,
+  "gen": [
+   195,
+   136
+  ]
+ },
+ "c1-128k": {
+  "prompt_tokens": 131632,
+  "decode_median": 154.5541807291239,
+  "ttft_median": 50.37517981450219,
+  "prefill_rate_median": 2613.042903781178,
+  "gen": [
+   256,
+   239
+  ]
+ },
+ "c1-256k": {
+  "prompt_tokens": 259196,
+  "decode_median": 123.01360809662377,
+  "ttft_median": 130.5678245865056,
+  "prefill_rate_median": 1985.1460679102638,
+  "gen": [
+   256,
+   256
+  ]
+ },
+ "c4": {
+  "aggregate": 100.52027115074323,
+  "decode_per_stream_median": 52.81381237341933
+ },
+ "c8": {
+  "aggregate": 97.26944403481166,
+  "decode_per_stream_median": 26.19230450818852
+ },
+ "prefix_hit_rate": 0.0
+}

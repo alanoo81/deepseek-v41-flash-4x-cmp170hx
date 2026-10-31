@@ -1,0 +1,11 @@
+--- a/docker/prepare.sh
++++ b/docker/prepare.sh
+@@ -60,7 +60,7 @@
+ # sha256 of the files the build writes, as validated. The same inputs always
+ # give the same bytes; anything else is not the validated checkpoint.
+ HYBRID_SHA256="config.json=ebc5ca822e4af47f63f7ac5707ea09a5f5af4ea00284912ba0f92a7c3bb7a78f
+-model.safetensors.index.json=e96523840003f6ca8f071250343f8188937fd9ed684dba1f713217b9c0574aba
++model.safetensors.index.json=5d98a2d8865153a70ee013a7cb2a191fbb791f46c6e0aea34ee96443ba486fb4
+ quantization_config.json=c6cdf9f915cb7fa48b7564243fd179f9b8530a9f2bd5d17b91c6dbb4f8ec1e15"
+ NEED_DISK_GB="${NEED_DISK_GB:-680}"
+ CACHE=/cache

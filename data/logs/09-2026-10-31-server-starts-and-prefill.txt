@@ -1,0 +1,60 @@
+# Server-start and benchmark lines quoted in docs/results.md (2026-10-30/31), extracted from the engine logs
+# and our orchestration logs. Times are UTC in engine lines, CET in orchestration lines.
+
+## KV pool at start (vLLM 'Available KV cache memory' per card, 'GPU KV cache size')
+INFO 10-30 17:51:34 [gpu_worker.py:812] Available KV cache memory: 7.76 GiB
+INFO 10-30 17:51:34 [kv_cache_utils.py:1061] GPU KV cache size: 2,154,551 tokens, Maximum concurrency for 262,144 tokens per request: 8.22x
+INFO 10-30 21:04:55 [gpu_worker.py:812] Available KV cache memory: 7.76 GiB
+INFO 10-30 21:04:55 [kv_cache_utils.py:1061] GPU KV cache size: 2,154,551 tokens, Maximum concurrency for 262,144 tokens per request: 8.22x
+INFO 10-30 22:14:58 [gpu_worker.py:812] Available KV cache memory: 7.76 GiB
+INFO 10-30 22:14:58 [kv_cache_utils.py:1061] GPU KV cache size: 2,154,551 tokens, Maximum concurrency for 262,144 tokens per request: 8.22x
+INFO 10-31 08:19:52 [gpu_worker.py:812] Available KV cache memory: 5.78 GiB
+INFO 10-31 08:19:52 [kv_cache_utils.py:1061] GPU KV cache size: 1,604,950 tokens, Maximum concurrency for 262,144 tokens per request: 6.12x
+INFO 10-31 09:20:21 [gpu_worker.py:812] Available KV cache memory: 7.68 GiB
+INFO 10-31 09:20:21 [kv_cache_utils.py:1061] GPU KV cache size: 2,133,214 tokens, Maximum concurrency for 262,144 tokens per request: 8.14x
+INFO 10-31 10:05:30 [gpu_worker.py:812] Available KV cache memory: 5.78 GiB
+INFO 10-31 10:05:30 [kv_cache_utils.py:1061] GPU KV cache size: 2,738,502 tokens, Maximum concurrency for 262,144 tokens per request: 10.45x
+INFO 10-31 10:57:26 [gpu_worker.py:812] Available KV cache memory: 5.78 GiB
+INFO 10-31 10:57:26 [kv_cache_utils.py:1061] GPU KV cache size: 2,738,502 tokens, Maximum concurrency for 262,144 tokens per request: 10.45x
+INFO 10-31 11:05:50 [gpu_worker.py:812] Available KV cache memory: 5.78 GiB
+INFO 10-31 11:05:51 [kv_cache_utils.py:1061] GPU KV cache size: 2,738,502 tokens, Maximum concurrency for 262,144 tokens per request: 10.45x
+INFO 10-31 11:27:03 [gpu_worker.py:812] Available KV cache memory: 7.68 GiB
+INFO 10-31 11:27:03 [kv_cache_utils.py:1061] GPU KV cache size: 2,133,214 tokens, Maximum concurrency for 262,144 tokens per request: 8.14x
+INFO 10-31 12:04:44 [gpu_worker.py:812] Available KV cache memory: 5.78 GiB
+INFO 10-31 12:04:44 [kv_cache_utils.py:1061] GPU KV cache size: 1,604,950 tokens, Maximum concurrency for 262,144 tokens per request: 6.12x
+INFO 10-31 12:24:50 [gpu_worker.py:812] Available KV cache memory: 2.52 GiB
+INFO 10-31 12:24:50 [kv_cache_utils.py:1061] GPU KV cache size: 1,166,235 tokens, Maximum concurrency for 262,144 tokens per request: 4.45x
+INFO 10-31 13:34:45 [gpu_worker.py:812] Available KV cache memory: 2.52 GiB
+INFO 10-31 13:34:45 [kv_cache_utils.py:1061] GPU KV cache size: 1,166,235 tokens, Maximum concurrency for 262,144 tokens per request: 4.45x
+INFO 10-31 13:44:35 [gpu_worker.py:812] Available KV cache memory: 5.78 GiB
+INFO 10-31 13:44:35 [kv_cache_utils.py:1061] GPU KV cache size: 2,738,502 tokens, Maximum concurrency for 262,144 tokens per request: 10.45x
+INFO 10-31 14:17:24 [gpu_worker.py:812] Available KV cache memory: 2.52 GiB
+INFO 10-31 14:17:24 [kv_cache_utils.py:1061] GPU KV cache size: 1,166,235 tokens, Maximum concurrency for 262,144 tokens per request: 4.45x
+INFO 10-31 14:25:11 [gpu_worker.py:812] Available KV cache memory: 5.78 GiB
+INFO 10-31 14:25:11 [kv_cache_utils.py:1061] GPU KV cache size: 2,737,577 tokens, Maximum concurrency for 262,144 tokens per request: 10.44x
+INFO 10-31 16:25:02 [gpu_worker.py:812] Available KV cache memory: 5.78 GiB
+INFO 10-31 16:25:03 [kv_cache_utils.py:1061] GPU KV cache size: 2,738,502 tokens, Maximum concurrency for 262,144 tokens per request: 10.45x
+INFO 10-31 17:06:03 [gpu_worker.py:812] Available KV cache memory: 2.53 GiB
+INFO 10-31 17:06:03 [kv_cache_utils.py:1061] GPU KV cache size: 1,171,657 tokens, Maximum concurrency for 262,144 tokens per request: 4.47x
+INFO 10-31 17:51:46 [gpu_worker.py:812] Available KV cache memory: 5.78 GiB
+INFO 10-31 17:51:46 [kv_cache_utils.py:1061] GPU KV cache size: 3,189,000 tokens, Maximum concurrency for 262,144 tokens per request: 12.17x
+INFO 10-31 18:32:32 [gpu_worker.py:812] Available KV cache memory: 2.53 GiB
+INFO 10-31 18:32:32 [kv_cache_utils.py:1061] GPU KV cache size: 1,360,109 tokens, Maximum concurrency for 262,144 tokens per request: 5.19x
+INFO 10-31 19:35:44 [gpu_worker.py:812] Available KV cache memory: 2.53 GiB
+INFO 10-31 19:35:44 [kv_cache_utils.py:1061] GPU KV cache size: 1,360,109 tokens, Maximum concurrency for 262,144 tokens per request: 5.19x
+INFO 10-31 19:45:39 [gpu_worker.py:812] Available KV cache memory: 5.67 GiB
+INFO 10-31 19:45:39 [kv_cache_utils.py:1061] GPU KV cache size: 4,211,001 tokens, Maximum concurrency for 1,048,576 tokens per request: 4.02x
+
+## Memory setting 0.98 on Morrowmake (BF16 rows): out of memory on a normal request
+ERROR 10-31 09:26:37 [multiproc_executor.py:1064] torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 626.00 MiB. GPU 1 has a total capacity of 63.39 GiB of which 473.31 MiB is free. Including non-PyTorch memory, this process has 62.92 GiB memory in use. Of the allocated memory 61.12 GiB is allocated by PyTorch, with 68.00 MiB allocated in private pools (e.g., CUDA Graphs), and 1.05 GiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)
+
+## Cold prefill, median of 9 (three books of 24-38k tokens)
+gnmac cold prefill median of 9: 2349 tok/s
+mm-k3 cold prefill median of 9: 4004 tok/s
+mm-kvc15 cold prefill median of 9: 3749 tok/s
+mm-kvc (compact v1) cold prefill median of 9: 3392 tok/s
+
+## Exact recall at long contexts (tests/longctx.py, data/bench/longctx-1m.json), --max-model-len 1048576, no DSpark
+  131072 tokens (prompt 131238) : recall 8/8, TTFT 40.6 s, decode 54.5 tok/s
+  524288 tokens (prompt 522280) : recall 8/8, TTFT 255.9 s, decode 49.6 tok/s
+ 1000000 tokens (prompt 996972) : recall 8/8, TTFT 708.8 s, decode 46.0 tok/s

@@ -1,0 +1,410 @@
+diff -ruN a/vllm/models/deepseek_v41/nvidia/ops/sm80_attn_core.py b/vllm/models/deepseek_v41/nvidia/ops/sm80_attn_core.py
+--- a/vllm/models/deepseek_v41/nvidia/ops/sm80_attn_core.py
++++ b/vllm/models/deepseek_v41/nvidia/ops/sm80_attn_core.py
+@@ -56,6 +56,7 @@
+ 
+ import torch
+ 
++from vllm.models.deepseek_v41.nvidia.ops import sm80_kv_pack as kv_pack
+ from vllm.models.deepseek_v41.nvidia.ops.sm80_act_quant import qdq_fp4, qdq_fp8
+ 
+ FLT_MAX = torch.finfo(torch.float32).max
+@@ -247,11 +248,12 @@
+     req: torch.Tensor,
+     local: torch.Tensor,
+ ) -> torch.Tensor:
+-    """Rows of compressed positions ``local`` (>= 0) of requests ``req``."""
++    """Rows of compressed positions ``local`` (>= 0) of requests ``req``
++    (BF16; a packed cache's rows are unpacked, ``sm80_kv_pack``)."""
+     entries = cache.shape[1]
+     local = local.to(torch.int64)
+     blk = block_table[req.to(torch.int64), local // entries].to(torch.int64)
+-    return cache[blk, local % entries]
++    return kv_pack.unpack_like(cache, cache[blk, local % entries])
+ 
+ 
+ # ---------------------------------------------------------------------------
+@@ -412,17 +414,23 @@
+     group_pos = batch.positions + 1 - cfg.compress_ratio
+     if cfg.owns_k:
+         assert caches.idxk is not None and batch.idxk_slots is not None
+-        store_rows(
+-            caches.idxk,
+-            torch.where(closes, batch.idxk_slots, -1),
+-            index_keys(cfg, weights, latent, group_pos),
+-        )
++        if kv_pack.is_packed(caches.idxk):
++            # The packed form of index_key_rows: the same FP4 (32, E8M0) codes.
++            assert weights.wk is not None and weights.k_norm is not None
++            k = rms_norm(weights.wk(latent), weights.k_norm, cfg.eps)
++            keys = kv_pack.pack_idxk(rope(k, group_pos, weights.freqs))
++        else:
++            keys = index_keys(cfg, weights, latent, group_pos)
++        store_rows(caches.idxk, torch.where(closes, batch.idxk_slots, -1), keys)
+     assert batch.comp_slots is not None
+-    store_rows(
+-        caches.comp,
+-        torch.where(closes, batch.comp_slots, -1),
+-        compressed_kv(latent, group_pos, weights.freqs),
+-    )
++    comp_slots = torch.where(closes, batch.comp_slots, -1)
++    if kv_pack.is_packed(caches.comp):
++        # The packed form of compressed_kv (the same FP4 (16, E4M3) codes),
++        # beside the row's packed index key.
++        rows = kv_pack.pack_comp(rope(latent, group_pos, weights.freqs))
++        store_rows(kv_pack.latent_rows(caches.comp), comp_slots, rows)
++    else:
++        store_rows(caches.comp, comp_slots, compressed_kv(latent, group_pos, weights.freqs))
+ 
+ 
+ # ---------------------------------------------------------------------------
+diff -ruN a/vllm/models/deepseek_v41/nvidia/ops/sm80_attn_fused.py b/vllm/models/deepseek_v41/nvidia/ops/sm80_attn_fused.py
+--- a/vllm/models/deepseek_v41/nvidia/ops/sm80_attn_fused.py
++++ b/vllm/models/deepseek_v41/nvidia/ops/sm80_attn_fused.py
+@@ -38,6 +38,7 @@
+ import torch
+ from triton.language.extra import libdevice
+ 
++from vllm.models.deepseek_v41.nvidia.ops import sm80_kv_pack as kv_pack
+ from vllm.models.deepseek_v41.nvidia.ops.sm80_act_quant import qdq_fp8_tile
+ from vllm.triton_utils import tl, triton
+ 
+@@ -386,6 +387,10 @@
+     assert q.stride(2) == 1 and swa_cache.stride(2) == 1
+     assert swa_indices.stride(1) == 1
+     has_comp = comp_local is not None and comp_local.shape[1] > 0
++    if has_comp and kv_pack.is_packed(comp_cache):
++        # Packed rows: attend over a BF16 copy of each query's selection.
++        comp_cache, comp_block_table, comp_local, req = kv_pack.unpack_selected(
++            comp_cache, comp_block_table, comp_local[:n], req[:n])
+     if has_comp:
+         assert comp_cache is not None and comp_block_table is not None
+         assert comp_cache.stride(2) == 1 and comp_local.stride(1) == 1
+diff -ruN a/vllm/models/deepseek_v41/nvidia/ops/sm80_attn_pipeline.py b/vllm/models/deepseek_v41/nvidia/ops/sm80_attn_pipeline.py
+--- a/vllm/models/deepseek_v41/nvidia/ops/sm80_attn_pipeline.py
++++ b/vllm/models/deepseek_v41/nvidia/ops/sm80_attn_pipeline.py
+@@ -11,6 +11,7 @@
+ import torch
+ from triton.language.extra import libdevice
+ 
++from vllm.models.deepseek_v41.nvidia.ops import sm80_kv_pack as kv_pack
+ from vllm.models.deepseek_v41.nvidia.ops.sm80_act_quant import qdq_fp4_tile
+ from vllm.models.deepseek_v41.nvidia.ops.sm80_index_scores import score_tile
+ from vllm.models.deepseek_v41.nvidia.ops.sm80_index_topk import (
+@@ -87,16 +88,20 @@
+                                   ce: tl.constexpr, E: tl.constexpr,
+                                   rb: tl.constexpr, re: tl.constexpr,
+                                   CAP: tl.constexpr, D: tl.constexpr,
+-                                  RD: tl.constexpr, RATIO: tl.constexpr):
++                                  RD: tl.constexpr, RATIO: tl.constexpr,
++                                  PACKED: tl.constexpr):
+     t = tl.program_id(0).to(tl.int64)
+     if tl.program_id(1) == 0:
+         if tl.load(closes + t):
+             d = tl.arange(0, D)
+             x = tl.load(latent + t * D + d).to(tl.float32)
+             x = _rope_row(x, tl.load(pos + t) + 1 - RATIO, freqs, D, RD)
+-            x = tl.reshape(qdq_fp4_tile(tl.reshape(x, (D // 16, 16)), True), (D,))
+             slot = tl.load(comp_slots + t).to(tl.int64)
+-            tl.store(comp + (slot // E) * cb + (slot % E) * ce + d, x.to(tl.bfloat16))
++            if PACKED:
++                kv_pack.store_packed_row(comp, (slot // E) * cb + (slot % E) * ce, x, D, 16, True)
++            else:
++                x = tl.reshape(qdq_fp4_tile(tl.reshape(x, (D // 16, 16)), True), (D,))
++                tl.store(comp + (slot // E) * cb + (slot % E) * ce + d, x.to(tl.bfloat16))
+     elif RATIO == 2:
+         # Only unique last-capacity raw rows may update the state ring.
+         r = tl.load(req + t).to(tl.int64)
+@@ -117,7 +122,8 @@
+                            kb: tl.constexpr, ke: tl.constexpr, E: tl.constexpr,
+                            H: tl.constexpr, IH: tl.constexpr, D: tl.constexpr,
+                            ID: tl.constexpr, RD: tl.constexpr,
+-                           RATIO: tl.constexpr, INDEX: tl.constexpr, OWNS_K: tl.constexpr):
++                           RATIO: tl.constexpr, INDEX: tl.constexpr, OWNS_K: tl.constexpr,
++                           K_PACKED: tl.constexpr):
+     t = tl.program_id(0).to(tl.int64)
+     part = tl.program_id(1)
+     p = tl.load(pos + t)
+@@ -142,10 +148,14 @@
+             inv = libdevice.rsqrt(tl.sum(x * x, 0) / ID + eps)
+             x = (tl.load(knorm + d).to(tl.float32) * (x * inv)).to(tl.bfloat16).to(tl.float32)
+             x = _rope_row(x, p + 1 - RATIO, freqs, ID, RD)
+-            x = tl.reshape(qdq_fp4_tile(tl.reshape(x, (ID // 32, 32)), False), (ID,))
+             slot = tl.load(kslots + t).to(tl.int64)
+-            if slot >= 0:
+-                tl.store(kcache + (slot // E) * kb + (slot % E) * ke + d, x.to(tl.bfloat16))
++            if K_PACKED:
++                if slot >= 0:
++                    kv_pack.store_packed_row(kcache, (slot // E) * kb + (slot % E) * ke, x, ID, 32, False)
++            else:
++                x = tl.reshape(qdq_fp4_tile(tl.reshape(x, (ID // 32, 32)), False), (ID,))
++                if slot >= 0:
++                    tl.store(kcache + (slot // E) * kb + (slot % E) * ke + d, x.to(tl.bfloat16))
+ 
+ 
+ @triton.jit(do_not_specialize=["T"])
+@@ -167,7 +177,8 @@
+                               E: tl.constexpr, H: tl.constexpr, D: tl.constexpr,
+                               HPR: tl.constexpr, CB: tl.constexpr,
+                               CK: tl.constexpr, MASK: tl.constexpr,
+-                              SOURCE: tl.constexpr, SEARCH_STEPS: tl.constexpr, B: tl.constexpr):
++                              SOURCE: tl.constexpr, SEARCH_STEPS: tl.constexpr, B: tl.constexpr,
++                              K_PACKED: tl.constexpr):
+     t = tl.program_id(0).to(tl.int64)
+     seg = tl.program_id(1)
+     visible = tl.load(nvis + t)
+@@ -190,7 +201,7 @@
+             total = tl.full((64,), float('-inf'), tl.float32)
+             if seg * B + tile * 64 < visible:
+                 total = score_tile(q, w, req, cache, bt, t, cols, visible,
+-                    qs, qh, ws, kb, ke, bts, E, H, D, HPR, 64)
++                    qs, qh, ws, kb, ke, bts, E, H, D, HPR, 64, K_PACKED)
+             if MASK:
+                 # Candidate IDs are sorted and -1 padded. Binary search the
+                 # sorted valid prefix using -1 as +infinity, without a mask spool.
+@@ -292,7 +303,8 @@
+         weights.freqs, raw.stride(0), caches.comp.stride(0), caches.comp.stride(1),
+         caches.comp.shape[1], ring.stride(0), ring.stride(1),
+         caches.ring.shape[1] if caches.ring is not None else 1,
+-        cfg.head_dim, cfg.rope_dim, cfg.compress_ratio, enable_fp_fusion=False)
++        cfg.head_dim, cfg.rope_dim, cfg.compress_ratio, kv_pack.is_packed(caches.comp),
++        enable_fp_fusion=False)
+ 
+ 
+ def query_key_post(cfg, weights, caches, batch, q, iq, iw, k, ws):
+@@ -313,7 +325,7 @@
+         q.stride(0), q.stride(1), iq.stride(0), iq.stride(1), iw.stride(0),
+         k.stride(0), kc.stride(0), kc.stride(1), kc.shape[1],
+         cfg.n_local_heads, ih, cfg.head_dim, 128, cfg.rope_dim, cfg.compress_ratio,
+-        indexed, cfg.owns_k, enable_fp_fusion=False)
++        indexed, cfg.owns_k, cfg.owns_k and kv_pack.is_packed(kc), enable_fp_fusion=False)
+     return ws.q[:t]
+ 
+ 
+@@ -338,7 +350,7 @@
+         cfg.index_heads_per_rank, cfg.candidate_block_size,
+         cfg.candidate_topk_blocks, cfg.uses_candidates and not cfg.is_candidate_source,
+         cfg.is_candidate_source, cfg.candidate_topk_blocks.bit_length(),
+-        SEGMENT, num_warps=4, enable_fp_fusion=False)
++        SEGMENT, kv_pack.is_packed(caches.idxk), num_warps=4, enable_fp_fusion=False)
+     # Token selection must consume the producer histogram before the candidate
+     # selector reuses it. Both use the source's unmasked scores at a source.
+     select(scores, ws.nvis[:t], caches.topk[:t], ws.selection, first_histogram=True)
+diff -ruN a/vllm/models/deepseek_v41/nvidia/ops/sm80_index_scores.py b/vllm/models/deepseek_v41/nvidia/ops/sm80_index_scores.py
+--- a/vllm/models/deepseek_v41/nvidia/ops/sm80_index_scores.py
++++ b/vllm/models/deepseek_v41/nvidia/ops/sm80_index_scores.py
+@@ -29,6 +29,7 @@
+ from vllm.model_executor.warmup.jit_warmup_triton_helper import (
+     triton_scalar_specialization_rep,
+ )
++from vllm.models.deepseek_v41.nvidia.ops import sm80_kv_pack as kv_pack
+ from vllm.triton_utils import tl, triton
+ 
+ _BLOCK_N = 64
+@@ -46,13 +47,17 @@
+ def score_tile(q_ptr, w_ptr, req_ptr, k_ptr, bt_ptr, t, cols, n_vis,
+                stride_qt, stride_qh, stride_wt, stride_kb, stride_ke, stride_bt,
+                ENTRIES: tl.constexpr, H: tl.constexpr, D: tl.constexpr,
+-               HPR: tl.constexpr, BLOCK_N: tl.constexpr):
++               HPR: tl.constexpr, BLOCK_N: tl.constexpr,
++               PACKED: tl.constexpr = False):
+     valid = cols < n_vis
+     req = tl.load(req_ptr + t).to(tl.int64)
+     blk = tl.load(bt_ptr + req * stride_bt + cols // ENTRIES, mask=valid, other=0)
+     koff = blk.to(tl.int64) * stride_kb + (cols % ENTRIES).to(tl.int64) * stride_ke
+     d = tl.arange(0, D)
+-    k = tl.load(k_ptr + koff[:, None] + d[None, :], mask=valid[:, None], other=0.0)
++    if PACKED:
++        k = kv_pack.load_packed_rows(k_ptr, koff, valid, D, 32, False)
++    else:
++        k = tl.load(k_ptr + koff[:, None] + d[None, :], mask=valid[:, None], other=0.0)
+     hidx = tl.arange(0, H)
+     q = tl.load(q_ptr + t * stride_qt + hidx[:, None] * stride_qh + d[None, :])
+     s = tl.dot(q, tl.trans(k))  # [H, BLOCK_N] fp32
+@@ -95,6 +100,7 @@
+     D: tl.constexpr,
+     HPR: tl.constexpr,
+     BLOCK_N: tl.constexpr,
++    PACKED: tl.constexpr,
+ ):
+     t = tl.program_id(0).to(tl.int64)
+     tile = tl.program_id(1)
+@@ -111,7 +117,7 @@
+         return
+     total = score_tile(q_ptr, w_ptr, req_ptr, k_ptr, bt_ptr, t, cols, n_vis,
+         stride_qt, stride_qh, stride_wt, stride_kb, stride_ke, stride_bt,
+-        ENTRIES, H, D, HPR, BLOCK_N)
++        ENTRIES, H, D, HPR, BLOCK_N, PACKED)
+     tl.store(out_ptr + t * stride_ot + cols, total, mask=cols < n_cols)
+ 
+ 
+@@ -159,6 +165,7 @@
+         D=d,
+         HPR=heads_per_rank,
+         BLOCK_N=_BLOCK_N,
++        PACKED=kv_pack.is_packed(idxk),
+         num_warps=4,
+     )
+     return out
+diff -ruN a/vllm/models/deepseek_v41/nvidia/ops/sm80_sparse_attn.py b/vllm/models/deepseek_v41/nvidia/ops/sm80_sparse_attn.py
+--- a/vllm/models/deepseek_v41/nvidia/ops/sm80_sparse_attn.py
++++ b/vllm/models/deepseek_v41/nvidia/ops/sm80_sparse_attn.py
+@@ -14,10 +14,13 @@
+ 
+ import torch
+ 
++from vllm.models.deepseek_v41.nvidia.ops import sm80_kv_pack as kv_pack
+ from vllm.triton_utils import tl, triton
+ 
+ _BLOCK_H = 16
+ _BLOCK_N = 32
++# Queries whose packed selections are decoded at once (512 rows of 1 KiB each).
++_UNPACK_TOKENS = 128
+ 
+ 
+ @triton.jit
+@@ -126,6 +129,17 @@
+     assert q.stride(2) == 1 and swa_cache.stride(2) == 1
+     assert swa_indices.stride(1) == 1
+     has_comp = comp_local is not None and comp_local.shape[1] > 0
++    if has_comp and kv_pack.is_packed(comp_cache):
++        # Packed rows: attend over a BF16 copy of each query's selection
++        # (kv_pack.unpack_selected), _UNPACK_TOKENS queries at a time.
++        for t0 in range(0, n, _UNPACK_TOKENS):
++            t1 = min(t0 + _UNPACK_TOKENS, n)
++            rows, table, local, ident = kv_pack.unpack_selected(
++                comp_cache, comp_block_table, comp_local[t0:t1], req[t0:t1])
++            out[t0:t1] = sparse_attention_triton(
++                q[t0:t1], swa_cache, swa_indices[t0:t1], rows, table, local, ident,
++                attn_sink, scale)
++        return out
+     if has_comp:
+         assert comp_cache is not None and comp_block_table is not None
+         assert comp_cache.stride(2) == 1 and comp_local.stride(1) == 1
+diff -ruN a/vllm/models/deepseek_v41/nvidia/sm80_attention.py b/vllm/models/deepseek_v41/nvidia/sm80_attention.py
+--- a/vllm/models/deepseek_v41/nvidia/sm80_attention.py
++++ b/vllm/models/deepseek_v41/nvidia/sm80_attention.py
+@@ -57,6 +57,7 @@
+ )
+ from vllm.models.deepseek_v41.nvidia import sm80_swa_meta_batch
+ from vllm.models.deepseek_v41.nvidia.ops import sm80_attn_core as core
++from vllm.models.deepseek_v41.nvidia.ops import sm80_kv_pack as kv_pack
+ from vllm.models.deepseek_v41.nvidia.ops import sm80_mhc_side
+ from vllm.models.deepseek_v41.sparse_mla import (
+     DeepseekV4SparseMLABackend,
+@@ -172,9 +173,14 @@
+ 
+ 
+ class Sm80IndexKCache(DeepseekV4IndexerCache):
+-    """Index keys as BF16 rows of ``index_head_dim`` (256 B per key)."""
+-
+-    def get_kv_cache_spec(self, vllm_config: VllmConfig) -> KVCacheSpec:
++    """Index keys as BF16 rows of ``index_head_dim`` (256 B per key). With
++    ``VLLM_SM80_COMPACT_KV=1`` the packed keys live in the kv source's
++    compressed-KV rows (``sm80_kv_pack.index_key_rows``) and this cache
++    declares no memory."""
++
++    def get_kv_cache_spec(self, vllm_config: VllmConfig) -> KVCacheSpec | None:
++        if kv_pack.compact_kv_enabled():
++            return None
+         return MLAAttentionSpec(
+             block_size=self.cache_config.block_size,
+             num_kv_heads=1,
+@@ -271,6 +277,20 @@
+         self.k_cache = k_cache
+ 
+ 
++class _IndexKeyRows:
++    """The index-key rows an attention layer scores, as the index-scores
++    warmup reads them (``kv_cache``, empty until the caches are bound)."""
++
++    def __init__(self, attn: "DeepseekV41Sm80Attention"):
++        self._attn = attn
++
++    @property
++    def kv_cache(self) -> torch.Tensor:
++        if kv_pack.compact_kv_enabled() and self._attn._compressed_kv_cache().numel() == 0:
++            return self._attn._compressed_kv_cache()
++        return self._attn._sm80_index_key_cache()
++
++
+ # ---------------------------------------------------------------------------
+ # The attention layer
+ # ---------------------------------------------------------------------------
+@@ -317,6 +337,17 @@
+     def _indexer_cls(self, k_cache) -> type[DeepseekV4Indexer]:
+         return DeepseekV41Sm80Indexer
+ 
++    def get_kv_cache_spec(self, vllm_config: VllmConfig) -> KVCacheSpec | None:
++        """The compressed-KV cache: BF16 rows, or with ``VLLM_SM80_COMPACT_KV=1``
++        packed FP4 rows of the same values and the packed index keys
++        (``sm80_kv_pack``, 512 B)."""
++        spec = super().get_kv_cache_spec(vllm_config)
++        if spec is None or not kv_pack.compact_kv_enabled():
++            return spec
++        return dataclasses.replace(
++            spec, dtype=torch.uint8, state_content_bytes=kv_pack.COMP_ROW_BYTES
++        )
++
+     def __init__(
+         self,
+         vllm_config: VllmConfig,
+@@ -454,7 +485,7 @@
+             )
+ 
+             INDEX_SCORES_WARMUP.register_warmup(
+-                self.indexer.k_cache,
++                _IndexKeyRows(self),
+                 self.sm80_cfg.index_n_heads,
+                 self.sm80_cfg.index_head_dim,
+                 self.sm80_cfg.index_heads_per_rank,
+@@ -604,8 +635,10 @@
+                 index_weights.dtype != torch.bfloat16 or index_weights.stride(1) != 1):
+             reason = "index weights must have contiguous heads"
+         for cache in (caches.swa, caches.comp, caches.idxk):
+-            if cache is not None and (cache.dtype != torch.bfloat16 or cache.stride(2) != 1):
+-                reason = "cache rows must be BF16 with contiguous channels"
++            packed = cache is not caches.swa and kv_pack.is_packed(cache)
++            if cache is not None and ((cache.dtype != torch.bfloat16 and not packed)
++                                      or cache.stride(2) != 1):
++                reason = "cache rows must be BF16 or packed with contiguous channels"
+         if caches.ring is not None and (caches.ring.dtype != torch.float32 or
+                                        caches.ring.stride(2) != 1):
+             reason = "ring rows must be contiguous FP32"
+@@ -639,7 +672,7 @@
+             swa=self.swa_cache_layer.kv_cache,
+             topk=self.topk_indices_buffer,
+             comp=self._compressed_kv_cache() if self.compress_ratio else None,
+-            idxk=self.indexer.k_cache.kv_cache if self.indexer is not None else None,
++            idxk=self._sm80_index_key_cache(),
+             ring=(
+                 self.compressor.state_cache.kv_cache
+                 if self.compressor is not None
+@@ -649,6 +682,14 @@
+             candidates=self.candidate_block_buffer,
+         )
+ 
++    def _sm80_index_key_cache(self) -> torch.Tensor | None:
++        """The index-key rows this layer scores (its kv source's)."""
++        if self.indexer is None:
++            return None
++        if kv_pack.compact_kv_enabled():
++            return kv_pack.index_key_rows(self._compressed_kv_cache())
++        return self.indexer.k_cache.kv_cache
++
+     def _sm80_batch(self, attn_metadata: dict[str, Any], positions: torch.Tensor):
+         """Gather this step's token metadata from the upstream builders."""
+         swa = cast(Any, attn_metadata[self.swa_cache_layer.prefix])
+@@ -689,7 +730,11 @@
+             if self.is_kv_source:
+                 batch.comp_slots = comp.slot_mapping[:T]
+         if self.indexer is not None:
+-            idxk = cast(Any, attn_metadata[self.indexer.k_cache.prefix])
++            # Packed keys share the compressed-KV rows, so their pages too.
++            idxk = cast(Any, attn_metadata[
++                self.compressed_cache_prefix if kv_pack.compact_kv_enabled()
++                else self.indexer.k_cache.prefix
++            ])
+             batch.idxk_block_table = idxk.block_table
+             batch.idxk_slots = idxk.slot_mapping[:T]
+         if self.compressor is not None and self.compressor.state_cache is not None:
