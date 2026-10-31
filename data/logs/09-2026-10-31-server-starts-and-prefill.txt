@@ -58,3 +58,5 @@ mm-kvc (compact v1) cold prefill median of 9: 3392 tok/s
   131072 tokens (prompt 131238) : recall 8/8, TTFT 40.6 s, decode 54.5 tok/s
   524288 tokens (prompt 522280) : recall 8/8, TTFT 255.9 s, decode 49.6 tok/s
  1000000 tokens (prompt 996972) : recall 8/8, TTFT 708.8 s, decode 46.0 tok/s
+Morrowmake 1.0.0 as released, DSpark, 0.95: INFO 10-31 20:40:37 [gpu_worker.py:812] Available KV cache memory: 4.56 GiB
+Morrowmake 1.0.0 as released, DSpark, 0.95: INFO 10-31 20:40:37 [kv_cache_utils.py:1061] GPU KV cache size: 1,247,657 tokens, Maximum concurrency for 262,144 tokens per request: 4.76x

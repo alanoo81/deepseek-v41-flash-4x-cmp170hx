@@ -1,0 +1,253 @@
+{
+  "phase": "mm-release-dspark-code-c1",
+  "health_code": 200,
+  "health_body": "",
+  "runs": [
+    {
+      "http": 200,
+      "ttft_s": 0.1436389760056045,
+      "wall_s": 0.5769580880005378,
+      "decode_s": 0.43331911199493334,
+      "tok_s": 216.9301962409152,
+      "delivered_tok_s": 164.6566743335288,
+      "completion_tokens": 95,
+      "prompt_tokens": 40,
+      "finish_reason": "stop",
+      "nan": false,
+      "text_head": "```python\ndef clamp_range(values):\n    \"\"\"Return a new list with each int clamped to the range [0, 50].\"\"\"\n    return [max(0, min(50, v)) for v in values]\n```\n\nExample usage:\n\n```python\n>>> clamp_range([-10, 0, 25, 50, 75, 100])\n[0, 0, 25, 50, 50, 50]\n```",
+      "text": "```python\ndef clamp_range(values):\n    \"\"\"Return a new list with each int clamped to the range [0, 50].\"\"\"\n    return [max(0, min(50, v)) for v in values]\n```\n\nExample usage:\n\n```python\n>>> clamp_range([-10, 0, 25, 50, 75, 100])\n[0, 0, 25, 50, 50, 50]\n```",
+      "text_len": 255,
+      "usage": {
+        "prompt_tokens": 40,
+        "total_tokens": 135,
+        "completion_tokens": 95,
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      "spec": {
+        "drafts": 20,
+        "draft_tokens": 104,
+        "accepted": 74,
+        "accept_ratio": 0.7115,
+        "accepted_per_step": 3.7,
+        "mean_draft_tokens_per_step": 5.2,
+        "pos": [
+          0.85,
+          0.8,
+          0.75,
+          0.7,
+          0.5,
+          0.1,
+          0.0
+        ]
+      }
+    },
+    {
+      "http": 200,
+      "ttft_s": 0.1334649069904117,
+      "wall_s": 0.5653597479977179,
+      "decode_s": 0.43189484100730624,
+      "tok_s": 217.64557266015092,
+      "delivered_tok_s": 168.03460157263171,
+      "completion_tokens": 95,
+      "prompt_tokens": 40,
+      "finish_reason": "stop",
+      "nan": false,
+      "text_head": "```python\ndef clamp_range(values):\n    \"\"\"Return a new list with each int clamped to the range [0, 50].\"\"\"\n    return [max(0, min(50, v)) for v in values]\n```\n\nExample usage:\n\n```python\n>>> clamp_range([-10, 0, 25, 50, 75, 100])\n[0, 0, 25, 50, 50, 50]\n```",
+      "text": "```python\ndef clamp_range(values):\n    \"\"\"Return a new list with each int clamped to the range [0, 50].\"\"\"\n    return [max(0, min(50, v)) for v in values]\n```\n\nExample usage:\n\n```python\n>>> clamp_range([-10, 0, 25, 50, 75, 100])\n[0, 0, 25, 50, 50, 50]\n```",
+      "text_len": 255,
+      "usage": {
+        "prompt_tokens": 40,
+        "total_tokens": 135,
+        "completion_tokens": 95,
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      "spec": {
+        "drafts": 20,
+        "draft_tokens": 104,
+        "accepted": 74,
+        "accept_ratio": 0.7115,
+        "accepted_per_step": 3.7,
+        "mean_draft_tokens_per_step": 5.2,
+        "pos": [
+          0.85,
+          0.8,
+          0.75,
+          0.7,
+          0.5,
+          0.1,
+          0.0
+        ]
+      }
+    },
+    {
+      "http": 200,
+      "ttft_s": 0.14699753500462975,
+      "wall_s": 0.5809302940033376,
+      "decode_s": 0.43393275899870787,
+      "tok_s": 216.62342390766563,
+      "delivered_tok_s": 163.5308073630159,
+      "completion_tokens": 95,
+      "prompt_tokens": 40,
+      "finish_reason": "stop",
+      "nan": false,
+      "text_head": "```python\ndef clamp_range(values):\n    \"\"\"Return a new list with each int clamped to the range [0, 50].\"\"\"\n    return [max(0, min(50, v)) for v in values]\n```\n\nExample usage:\n\n```python\n>>> clamp_range([-10, 0, 25, 50, 75, 100])\n[0, 0, 25, 50, 50, 50]\n```",
+      "text": "```python\ndef clamp_range(values):\n    \"\"\"Return a new list with each int clamped to the range [0, 50].\"\"\"\n    return [max(0, min(50, v)) for v in values]\n```\n\nExample usage:\n\n```python\n>>> clamp_range([-10, 0, 25, 50, 75, 100])\n[0, 0, 25, 50, 50, 50]\n```",
+      "text_len": 255,
+      "usage": {
+        "prompt_tokens": 40,
+        "total_tokens": 135,
+        "completion_tokens": 95,
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      "spec": {
+        "drafts": 20,
+        "draft_tokens": 104,
+        "accepted": 74,
+        "accept_ratio": 0.7115,
+        "accepted_per_step": 3.7,
+        "mean_draft_tokens_per_step": 5.2,
+        "pos": [
+          0.85,
+          0.8,
+          0.75,
+          0.7,
+          0.5,
+          0.1,
+          0.0
+        ]
+      }
+    },
+    {
+      "http": 200,
+      "ttft_s": 0.13369169599900488,
+      "wall_s": 0.5661956630065106,
+      "decode_s": 0.4325039670075057,
+      "tok_s": 217.3390469696402,
+      "delivered_tok_s": 167.78652011488052,
+      "completion_tokens": 95,
+      "prompt_tokens": 40,
+      "finish_reason": "stop",
+      "nan": false,
+      "text_head": "```python\ndef clamp_range(values):\n    \"\"\"Return a new list with each int clamped to the range [0, 50].\"\"\"\n    return [max(0, min(50, v)) for v in values]\n```\n\nExample usage:\n\n```python\n>>> clamp_range([-10, 0, 25, 50, 75, 100])\n[0, 0, 25, 50, 50, 50]\n```",
+      "text": "```python\ndef clamp_range(values):\n    \"\"\"Return a new list with each int clamped to the range [0, 50].\"\"\"\n    return [max(0, min(50, v)) for v in values]\n```\n\nExample usage:\n\n```python\n>>> clamp_range([-10, 0, 25, 50, 75, 100])\n[0, 0, 25, 50, 50, 50]\n```",
+      "text_len": 255,
+      "usage": {
+        "prompt_tokens": 40,
+        "total_tokens": 135,
+        "completion_tokens": 95,
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      "spec": {
+        "drafts": 20,
+        "draft_tokens": 104,
+        "accepted": 74,
+        "accept_ratio": 0.7115,
+        "accepted_per_step": 3.7,
+        "mean_draft_tokens_per_step": 5.2,
+        "pos": [
+          0.85,
+          0.8,
+          0.75,
+          0.7,
+          0.5,
+          0.1,
+          0.0
+        ]
+      }
+    },
+    {
+      "http": 200,
+      "ttft_s": 0.13473629900545347,
+      "wall_s": 0.5680984509963309,
+      "decode_s": 0.43336215199087746,
+      "tok_s": 216.9086515012016,
+      "delivered_tok_s": 167.22453622851643,
+      "completion_tokens": 95,
+      "prompt_tokens": 40,
+      "finish_reason": "stop",
+      "nan": false,
+      "text_head": "```python\ndef clamp_range(values):\n    \"\"\"Return a new list with each int clamped to the range [0, 50].\"\"\"\n    return [max(0, min(50, v)) for v in values]\n```\n\nExample usage:\n\n```python\n>>> clamp_range([-10, 0, 25, 50, 75, 100])\n[0, 0, 25, 50, 50, 50]\n```",
+      "text": "```python\ndef clamp_range(values):\n    \"\"\"Return a new list with each int clamped to the range [0, 50].\"\"\"\n    return [max(0, min(50, v)) for v in values]\n```\n\nExample usage:\n\n```python\n>>> clamp_range([-10, 0, 25, 50, 75, 100])\n[0, 0, 25, 50, 50, 50]\n```",
+      "text_len": 255,
+      "usage": {
+        "prompt_tokens": 40,
+        "total_tokens": 135,
+        "completion_tokens": 95,
+        "completion_tokens_details": {
+          "reasoning_tokens": 0
+        }
+      },
+      "spec": {
+        "drafts": 20,
+        "draft_tokens": 104,
+        "accepted": 74,
+        "accept_ratio": 0.7115,
+        "accepted_per_step": 3.7,
+        "mean_draft_tokens_per_step": 5.2,
+        "pos": [
+          0.85,
+          0.8,
+          0.75,
+          0.7,
+          0.5,
+          0.1,
+          0.0
+        ]
+      }
+    }
+  ],
+  "ts": 1793479336.0658,
+  "prompt": "coding-clamp-range",
+  "thinking": false,
+  "temperature": 0,
+  "concurrency": 1,
+  "note": "decode_ms_per_draft_step is a serving-cycle ratio, not a kernel timing",
+  "warmup": {
+    "tok_s": 204.10495085933206,
+    "ttft_s": 0.14636945899110287,
+    "completion_tokens": 32
+  },
+  "tok_s_median": 216.9301962409152,
+  "tok_s_min": 216.62342390766563,
+  "tok_s_max": 217.64557266015092,
+  "ttft_median_s": 0.13473629900545347,
+  "completion_tokens_median": 95.0,
+  "accept_ratio_median": 0.7115,
+  "accepted_per_step_median": 3.7,
+  "mean_draft_tokens_per_step_median": 5.2,
+  "aggregate_tok_s_median": null,
+  "decode_ms_per_draft_step_median": 21.665955599746667,
+  "any_nan": false,
+  "health_code_after": 200,
+  "short_after": {
+    "http": 200,
+    "ttft_s": 0.13841708700056188,
+    "wall_s": 0.1782820369990077,
+    "decode_s": 0.03986494999844581,
+    "tok_s": 175.59284535093872,
+    "delivered_tok_s": 44.87272040785874,
+    "completion_tokens": 8,
+    "prompt_tokens": 32,
+    "finish_reason": "length",
+    "nan": false,
+    "text_head": "# How a Hash Map Works: A",
+    "text": "# How a Hash Map Works: A",
+    "text_len": 25,
+    "usage": {
+      "prompt_tokens": 32,
+      "total_tokens": 40,
+      "completion_tokens": 8,
+      "completion_tokens_details": {
+        "reasoning_tokens": 0
+      }
+    }
+  }
+}

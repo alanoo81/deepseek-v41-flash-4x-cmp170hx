@@ -18,24 +18,57 @@ scale bytes instead and decodes them back to the **same bits** when a kernel rea
 The patch is [`morrowmake/compact-kv/`](../morrowmake/compact-kv/). It changes nothing unless the
 environment sets `VLLM_SM80_COMPACT_KV=1`.
 
-## 1. Why it can be lossless
+## 1. Why it is lossless
 
-DeepSeek-V4.1's reference code rounds what it caches (Morrowmake reproduces this in `sm80_attn_core.py`):
+### 1.1 Morrowmake's BF16 cache already holds 4-bit values
+
+DeepSeek-V4.1's reference code rounds what it caches. Morrowmake reproduces this exactly, and tests it bit for bit
+against DeepSeek's code (`sm80_attn_core.py`):
 
 - the sliding-window rows: FP8 E4M3, one UE8M0 scale per 32 values;
 - the **compressed latent** (512 values, RoPE applied): FP4 E2M1, one **E4M3** scale per 16 values (the NVFP4 layout);
 - the **indexer keys** (128 values, RoPE applied): FP4 E2M1, one **E8M0** (power-of-two) scale per 32 values (MXFP4).
 
-Morrowmake keeps the rounded values in BF16 rows. Each value is `bf16(q x s)` with `q` on the E2M1 grid
-(0, 0.5, 1, 1.5, 2, 3, 4, 6, and their negatives) and `s` an E4M3 or E8M0 number. The product has at most
-5 significant bits, so it is exact in FP32 and exactly representable in BF16. Storing `q` as a 4-bit code and
-`s` as one byte, then recomputing `q x s`, gives back the BF16 row bit for bit, including `-0.0`.
+For one block of 16 latent values `x`, the reference computes:
 
-The packing itself (`pack_rows` in torch, `store_packed_row` in Triton) uses the same arithmetic as the
-reference's `fp4_qdq`: block maximum, scale, division, clamp, rounding to E2M1. The codes are then exactly the
-ones the BF16 path would have multiplied back.
+```
+s = E4M3( max(amax(|x|), 0.01171875) / 6 )     scale rounded to the nearest E4M3 number (at most 448)
+q = E2M1( clamp(x / s, -6, 6) )                each value rounded to the nearest of 0, ±0.5, ±1, ±1.5, ±2, ±3, ±4, ±6
+cached = bf16(q * s)
+```
+
+The indexer keys use the same steps with a power-of-two scale, `s = 2^ceil(log2(amax / 6))`, over blocks of 32.
+
+So a block of 16 cached BF16 values (256 bits) carries only 16 four-bit codes and one scale byte (72 bits).
+Morrowmake stores the 256 bits; we store the 72, plus padding.
+
+### 1.2 Decoding gives back the same bits
+
+- `q` has at most 2 significant bits (1.5 = 1.1 in binary, 3 = 1.1 x 2) and an E4M3 scale at most 4 (1.mmm).
+  Their product has **at most 6 significant bits**, so it is exact in FP32 (24 bits) and exactly representable
+  in BF16 (8 bits). The smallest non-zero product is 0.5 x 2^-9 = 2^-10 and the largest 6 x 448 = 2,688, both
+  normal BF16 numbers. With a power-of-two scale (index keys) the product is trivially exact.
+- So `bf16(q * s)` recomputed by our decoder is the value Morrowmake would have stored, bit for bit, not an
+  approximation of it.
+- **Signed zero.** A small negative value rounds to `-0.0` in the reference, and Morrowmake stores `-0.0`. The
+  4-bit code keeps its sign bit when the magnitude is 0, so `-0.0` decodes as `-0.0`.
+- **Example.** A block whose largest magnitude is 1.37: 1.37 / 6 = 0.2283, nearest E4M3 0.234375 (1.111 x 2^-3),
+  stored as one byte. A value -0.80 in that block: -0.80 / 0.234375 = -3.41, nearest E2M1 -3, code `1101`
+  (sign 1, magnitude index 5). Decoded: -3 x 0.234375 = -0.703125, the BF16 bits `0xBF34`, which is what the
+  BF16 row held.
+
+### 1.3 Packing makes the same choices as the reference
+
+Our packers (`pack_rows` in torch, `store_packed_row` in Triton) compute `s` and `q` with the same operations in
+the same order as Morrowmake's quantize-dequantize: the same floor on the block maximum, the same correctly rounded
+division (`div_rn`), the same E4M3 and E2M1 rounding. They therefore pick the same scale and the same codes. The
+GPU unit test checks it on 4,096 random rows of each format, including an all-zero row and rows of `-0.0`: the
+Triton bytes equal the torch bytes, and unpacking equals the reference quantize-dequantize.
 
 The sliding-window cache (FP8 values, 128 tokens per request) is left as it is: it is small and bounded.
+
+The values being identical is necessary, not sufficient: the kernels that read them must also compute the same
+thing. That turned out to be the hard part (section 3).
 
 ## 2. Layout (v1.5)
 
@@ -149,7 +182,29 @@ most 256 tokens), decode in tok/s / prefill in tok/s:
 
 Data: `data/bench/speed/speed-mm-k3.json` (BF16), `speed-mm-kvc.json` (v1), `speed-mm-kvc15.json`.
 
-## 7. Limits
+## 7. How we got there
+
+1. **The question.** GNmac's engine stores `fp8_ds_mla` records; Morrowmake's stores BF16 rows and
+   holds fewer tokens. We looked for a format in between that would give context back.
+2. **The observation.** Reading Morrowmake's attention core: the reference rounds the latent and the index keys
+   to FP4 before caching, and Morrowmake keeps the exact rounded values. A BF16 row is therefore 3.6x larger than
+   its information. No intermediate format is needed: the 4-bit codes and their scales are the information.
+3. **v1, exactness first.** We wrote the packers and the GPU unit test before the kernels, then changed every
+   read and write path (the torch store and gather, the Triton ring store, the key store, the index scores, both
+   attention kernels). The unit test found the `tl.dot` problem of section 3 at once; v1 fixed it with a
+   per-program scratch buffer. Served model: bit-identical on 1.39 M tokens, KV pool 1.60 M → 2.74 M tokens. But
+   decode lost 7-9 % and prefill 10-35 %.
+4. **v2, speed without touching exactness.** A kernel benchmark at served shapes (section 4) showed where the
+   time went: byte-by-byte decoding with each code byte read twice and each scale 16 times. We vectorised the
+   decoder, and moved attention to a BF16 copy of each query's selection read by Morrowmake's unchanged kernels.
+   Decode loss 2-5 %, prefill 6-10 %, still bit-identical.
+5. **v1.5, one row per position.** The latent row had 224 free bytes and the index key needs 68. Putting the key
+   there removed the index-key cache altogether: pool 2.74 M → 3.19 M tokens, same speed, still bit-identical.
+
+Every version went through the same two gates before anything else: the GPU unit test, then the token-by-token
+comparison of the served model's log-probabilities with the BF16 cache on the four frozen sets.
+
+## 8. Limits
 
 - Morrowmake's sm_80 engine only, release 1.0.0 (engine `a0c57b52`). The patch touches seven files of
   `vllm/models/deepseek_v41/nvidia/`.

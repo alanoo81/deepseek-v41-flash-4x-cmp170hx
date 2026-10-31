@@ -84,6 +84,30 @@ EN_BOOKS = [
     (174, "The Picture of Dorian Gray (Wilde)"),
     (2600, "War and Peace (Tolstoy, tr. Maude)"),
 ]
+# Added 2026-10-31 to check whether the French gain of the 18-22 graft extends to other languages (titles and
+# languages checked against the file headers that day).
+DE_BOOKS = [
+    (2407, "Die Leiden des jungen Werther, Band 1 (Goethe)"),
+    (22367, "Die Verwandlung (Kafka)"),
+    (69327, "Der Prozess (Kafka)"),
+    (34811, "Buddenbrooks (Thomas Mann)"),
+    (5323, "Effi Briest (Fontane)"),
+    (7205, "Also sprach Zarathustra (Nietzsche)"),
+    (2499, "Siddhartha (Hesse)"),
+    (6498, "Kabale und Liebe (Schiller)"),
+]
+IT_BOOKS = [
+    (45334, "I promessi sposi (Manzoni)"),
+    (52484, "Le avventure di Pinocchio (Collodi)"),
+    (61885, "Ricordi d'infanzia e di scuola (De Amicis)"),
+    (38720, "L'amore che torna (Guido da Verona)"),
+    (25179, "La carita del prossimo (Bersezio)"),
+    (25178, "Damiano (Carcano)"),
+    (22507, "Romanzo d'una signorina per bene (Vertua Gentile)"),
+    (22020, "L'indomani (Neera)"),
+]
+BOOKS = {"fr": (FR_BOOKS, "French"), "en": (EN_BOOKS, "English"), "de": (DE_BOOKS, "German"),
+         "it": (IT_BOOKS, "Italian")}
 # Code: the GNmac recipe (MIT, commit 2ad5741ab1, 2026-10-26: written after the model's release, so it cannot be
 # in its training data). Whitelist only; files that this repository patches or adds are excluded so the set is the
 # upstream text. Never add a pattern that could match .env (credentials).
@@ -260,9 +284,8 @@ def build_set(api, a, name, cache):
         log(f"[{name}] frozen corpus exists: {path} (use --rebuild to redo)")
         return
     seqs, sources = [], []
-    if name in ("fr", "en"):
-        books = FR_BOOKS if name == "fr" else EN_BOOKS
-        want = "French" if name == "fr" else "English"
+    if name in BOOKS:
+        books, want = BOOKS[name]
         per = [a.n_seqs // len(books) + (1 if i < a.n_seqs % len(books) else 0) for i in range(len(books))]
         for (bid, label), w in zip(books, per):
             url = GUTENBERG_URL.format(id=bid)
@@ -301,7 +324,7 @@ def build_set(api, a, name, cache):
         for k, win in enumerate(cut_windows(api, text, a.n_seqs, a.seq_len, kind)):
             seqs.append({"id": f"{name}/{name}/{k}", "source": name, **win})
     else:
-        raise SystemExit(f"unknown set {name!r} (fr, en, code, or one given with --local NAME=GLOB)")
+        raise SystemExit(f"unknown set {name!r} (fr, en, de, it, code, or one given with --local NAME=GLOB)")
     corpus = {"format": "nll_eval.corpus/1", "tool": VERSION, "set": name, "seq_len": a.seq_len,
               "n_seqs": len(seqs), "built": time.strftime("%Y-%m-%dT%H:%M:%S%z"), "server": api.server_info(),
               "sources": sources, "seqs": seqs,
@@ -761,7 +784,7 @@ def main():
         a.local_specs = {}
         for spec in a.local:
             k, _, v = spec.partition("=")
-            if not k or not v or k in ("fr", "en", "code"):
+            if not k or not v or k in (*BOOKS, "code"):
                 raise SystemExit(f"bad --local {spec!r}")
             a.local_specs[k] = v
     {"build": cmd_build, "run": cmd_run, "compare": cmd_compare, "selfcheck": cmd_selfcheck,
