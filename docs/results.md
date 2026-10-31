@@ -1,7 +1,7 @@
 # Results: the current configuration (Morrowmake engine, 3-bit graft, compact KV cache)
 
 This page lists what we measured from 2026-10-30 to 2026-10-31, with the file each number comes from. The
-measurements of the previous configuration (GNmac engine) are in [results-gnmac.md](results-gnmac.md).
+measurements of GNmac-lab 1.2.0 with our patches (Engram, copy and stress tests) are in [results-gnmac.md](results-gnmac.md).
 
 - **Measured** means it is in a data file under `data/`, or in a log quoted here.
 - **Inference** is our interpretation, labelled as such.
@@ -24,7 +24,7 @@ Only one stack runs at a time: each uses all four cards.
 
 | Name in the data | Engine | Routed experts | Compressed-attention caches | Memory setting |
 |---|---|---|---|---|
-| `ours` | GNmac-lab 1.2.0 (`2ad5741ab1`), our previous production | LibertAI 2.9 pack, layers 18-22 grafted to 3 bits | `fp8_ds_mla` | 0.98 |
+| `ours` | GNmac-lab 1.2.0 (`2ad5741ab1`) with our patches | LibertAI 2.9 pack, layers 18-22 grafted to 3 bits | `fp8_ds_mla` | 0.98 |
 | `k29` | GNmac-lab 1.2.0 | LibertAI 2.9 pack as published (layers 18-22 at 2 bits) | `fp8_ds_mla` | 0.97 |
 | `morrowmake` | Morrowmake 1.0.0 (`7f9023c`, engine `a0c57b52`) as published | LibertAI 2.9 pack as published | BF16 | 0.95 |
 | `mm-k3` | Morrowmake 1.0.0 | layers 18-22 grafted to 3 bits | BF16 | 0.95 |
@@ -74,13 +74,18 @@ windows.
 
 | A → B | Long windows (1,024) | Short (40) | **32k prose** | **32k code** |
 |---|---|---|---|---|
-| **Previous production → current** (`ours` → `mm-kvc15`) | +0.14 % [+0.03, +0.26] | -0.21 % [-0.52, +0.11] | **-0.58 % [-0.74, -0.43]** (14 of 19) | **-1.64 % [-1.92, -1.37]** (16 of 16) |
+| **GNmac → Morrowmake + compact cache, same grafted weights** (`ours` → `mm-kvc15`) | +0.14 % [+0.03, +0.26] | -0.21 % [-0.52, +0.11] | **-0.58 % [-0.74, -0.43]** (14 of 19) | **-1.64 % [-1.92, -1.37]** (16 of 16) |
 | Engine only, same weights (`k29` → `morrowmake`) | +0.15 % [+0.02, +0.29] | -0.29 % [-0.59, +0.02] | -0.57 % [-0.73, -0.42] (14 of 19) | not run |
 | Graft 2 → 3 bits, Morrowmake engine (`morrowmake` → `mm-k3`) | **-1.81 % [-2.01, -1.61]** (151 of 192) | -0.49 % [-0.84, -0.13] | **-2.31 % [-2.75, -1.79]** (18 of 19) | -0.06 % [-0.12, -0.00] |
 | Graft 2 → 3 bits, GNmac engine (`k29` → `k3`), for reference | -1.80 % [-2.00, -1.60] | -0.57 % [-0.92, -0.22] | not run | not run |
 | Compact KV cache (`mm-k3` → `mm-kvc15`) | identical | identical | identical | identical |
 | Layers 36-39 at 4 bits (`mm-kvc15` → `mm-k3k4`) | -0.04 % [-0.08, +0.01] | -0.08 % [-0.22, +0.07] | -0.11 % [-0.15, -0.07] (17 of 19) | -0.11 % [-0.14, -0.09] (16 of 16) |
 | Release shortcuts off (`mm-kvc15` → `mm-kvc-faithful`) | +0.04 % [-0.05, +0.13] | not run | not run | +0.00 % [-0.04, +0.05] |
+
+German and Italian (64 windows of 1,024 tokens from 8 Gutenberg books each, `data/nll/lang/`), `morrowmake` →
+`mm-kvc15`: German **-3.03 % [-3.71, -2.37]** (56 of 64 windows, every book better), Italian -0.77 % [-1.36, -0.22]
+(30 of 64). In Italian the two best-known books gain 4.4 % and 3.9 %; of the six lesser-known novels, five lose
+0.36 to 0.55 % and one gains 0.11 %. *Inference:* part of the graft's gain may be recall of text seen in training.
 
 Per corpus, for the rows that matter:
 
@@ -100,9 +105,10 @@ Per corpus, for the rows that matter:
   are many positions to choose from.
 - **The graft works in both engines, by the same amount.** -1.81 % with Morrowmake, -1.80 % with GNmac on
   long windows, -4.45 % on French in both.
-- **The engine and the graft add up.** From our previous production (GNmac + graft) to the current
-  configuration (Morrowmake + graft + compact cache): -0.58 % on 32k prose, -1.64 % on 32k code with all 16
-  windows better, and +0.14 % on 1,024-token windows. We chose the long contexts: agentic and coding work
+- **The engine and the graft add up.** With the same grafted weights, from GNmac's engine to Morrowmake's with
+  the compact cache: -0.58 % on 32k prose, -1.64 % on 32k code with all 16 windows better, and +0.14 % on
+  1,024-token windows. Against the two recipes as released: -1.81 % (Morrowmake) and -1.66 % (GNmac) on
+  1,024-token windows, -2.31 % and -2.87 % on 32k prose (`morrowmake-B` and `k29` against `mm-kvc15`). We chose the long contexts: agentic and coding work
   lives there.
 - **The compact KV cache changes nothing** (2.3).
 - **4-bit experts are at the plateau.** Layers 36-39 at 4 bits gain 0.11 % on long contexts and nothing
@@ -154,6 +160,7 @@ Tokens of KV cache vLLM reports at start, 262,144-token context, 8 sequences (th
 | compact v1 | 5.78 GiB | 2,738,502 | 10.4 |
 | **`mm-kvc15`, no DSpark** | **5.78 GiB** | **3,189,000** | **12.2** |
 | **`mm-kvc15` + DSpark (served)** | **2.53 GiB** | **1,360,109** | **5.2** |
+| `morrowmake` as released (DSpark, 0.95) | 4.56 GiB | 1,247,657 | 4.8 |
 | `mm-k3k4` | | 2,317,960 | 8.8 |
 
 - The graft costs 1.98 GiB per card (2.15 M → 1.60 M tokens with BF16 rows); the compact cache more than
@@ -171,18 +178,21 @@ completion tokens / wall time of a batch of simultaneous requests. tok/s, struct
 
 | Configuration | 1 user | 2 users | 4 users | 8 users |
 |---|---|---|---|---|
-| GNmac + graft, no DSpark (previous production) | 105.4 / 105.0 / 104.8 | 174 / 148 / 168 | 325 / 282 / 289 | 560 / 482 / 449 |
+| GNmac + graft, no DSpark | 105.4 / 105.0 / 104.8 | 174 / 148 / 168 | 325 / 282 / 289 | 560 / 482 / 449 |
 | GNmac + graft + DSpark | 366 / 268 / 202 | 454 / 261 / 258 | 659 / 399 / 365 | 884 / 563 / 476 |
 | **`mm-kvc15` + DSpark (served)** | **267 / 212 / 153** | 349 / 169 / 217 | 485 / 306 / 295 | **570 / 291 / 349** |
 | `mm-kvc15`, no DSpark | 72.1 / 72.9 / 72.0 | 144 / 93 / 139 | 257 / 183 / 251 | 397 / 245 / 341 |
 | `mm-k3k4`, no DSpark | 62.4 / 64.5 / 63.6 | 129 / 96 / 124 | 225 / 168 / 218 | 334 / 215 / 283 |
 | `mm-kvc-faithful` (compact v1), no DSpark | 30.8 / 31.1 / 30.6 | 66 / 57 / 62 | 111 / 67 / 107 | 150 / 111 / 132 |
 
-- **The code column does not compare across engines.** The code prompt's answer is 48 tokens long on
-  Morrowmake and 95 on GNmac (`completion_tokens_median` in the JSON files); shorter answers carry more fixed
-  cost per token, so compare the engines on the structured and prose columns. (`mm-kvc-faithful` also answered
-  95 tokens.)
-- **The current configuration is slower than our previous one.** GNmac's engine decodes about 1.45x faster
+- **The code column does not compare across configurations.** `mm-kvc15` (and `mm-k3k4`) answer the code prompt
+  in 48 tokens; GNmac, Morrowmake as released and `mm-kvc-faithful` answer it in 95 (`completion_tokens_median`
+  in the JSON files). It is a different greedy answer, not an engine property; shorter answers carry more fixed
+  cost per token, so compare on the structured and prose columns.
+- **Morrowmake 1.0.0 as released, DSpark, measured here:** 276 / 217 / 151 tok/s for one user, 585 / 355 / 353
+  at 8 users, KV pool 1,247,657 tokens (`data/bench/mia-json-2026-10-31/mm-release-dspark-*.json`). Ours is
+  1-3 % slower on structured and prose, the cost of the compact cache.
+- **Our configuration is slower than GNmac's engine.** GNmac's engine decodes about 1.45x faster
   at one stream without DSpark (105 against 72 tok/s), and 1.3-1.4x faster with DSpark (structured 366 against
   267, prose 202 against 153). We traded that speed for the long-context quality of 2.2.
 - DSpark multiplies single-stream speed by 2.1 to 3.7 on Morrowmake; at 8 users the gain is 1.0 to 1.4x.
@@ -256,7 +266,7 @@ We started `mm-kvc15` without DSpark and with `--max-model-len 1048576`:
 
 - Distance to the unquantized model: every perplexity change here is relative between our configurations.
 - Downstream tasks (HumanEval, GSM8K) on the current configuration. On the previous comparison they could not
-  separate the stacks ([comparison-morrowmake.md](comparison-morrowmake.md)).
+  separate the stacks ([comparison-morrowmake.md](comparison-morrowmake.md#a04-humaneval-and-gsm8k)).
 - Quality at 1M tokens beyond the recall test of section 5.
 - Reproducibility across restarts of the 32k-code set (no repeat run).
 - The 32k code set on the GNmac 2.9 pack (`k29`), so the "engine only" row has no 32k-code cell.
