@@ -420,6 +420,30 @@ number. These were the ones that mattered here.
 
 ---
 
+## 11. Lessons from the second round (2026-10-31)
+
+The second round (Morrowmake's engine, the compact KV cache) was run the same way. Four things are worth
+keeping.
+
+- **A unit test at served shapes caught what the end-to-end test might have missed.** The first compact-cache
+  kernels decoded the packed rows in registers right before the attention's matrix multiply. The GPU unit test
+  compares every output bit with the BF16 path and found one element in about 40,000 one BF16 ulp apart, with
+  identical operands. A perplexity run would almost certainly not have shown it. The fix we kept makes
+  identity hold by construction: decode into a BF16 buffer and run the unmodified kernels on it.
+- **The agent's own benchmark fell into the "different methods" trap.** Its new speed script reported an
+  8-user "aggregate" far below the figures published for the same stack. The human operator asked why. The
+  script's aggregate was dominated by 3.5k-token prefills and staggered arrivals, while the published protocol
+  sends short prompts at once. The fix was to rerun the published protocol on every stack and to stop quoting
+  the script's aggregate.
+- **A plan built on a wrong premise was caught before it cost anything.** The agent proposed to "move more
+  layers to 3 bits" with the memory the compact cache freed. Re-reading its own notes before the download, it
+  found that every layer was already at 3 bits since the graft. It told the operator, and the plan became a
+  4-bit test of the layers no earlier test had covered (36-39). That test then measured a gain, but a small
+  one.
+- **"More faithful" settings were measured, not assumed.** Turning off the release's numerical shortcuts
+  (BF16 all-reduce of `wo_b`, the MoE v2 kernels, one rounding per MoE all-reduce) sounded like a fidelity gain. It changed perplexity by
+  +0.04 % [-0.05, +0.13] and made decoding 2.3x slower, so the shortcuts stayed.
+
 ## Credits
 
 - GNmac-lab, [`deepseek-v41-flash-1017-cmp170hx`](https://github.com/GNmac-lab/deepseek-v41-flash-1017-cmp170hx)
@@ -437,4 +461,4 @@ number. These were the ones that mattered here.
   layers.
 - turboderp: exllamav3. vcruz305: [`vllm-exl3`](https://github.com/vcruz305/vllm-exl3).
 
-Results are in `docs/results.md`; the quality research is in `docs/quality-research.md`.
+Results are in `docs/results.md` (current configuration) and `docs/results-gnmac.md` (previous one); the quality research is in `docs/quality-research.md`.

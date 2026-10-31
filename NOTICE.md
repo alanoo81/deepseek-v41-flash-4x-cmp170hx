@@ -2,7 +2,28 @@
 
 This repository's own scripts, patches, tests, measurement data and documents are under the MIT licence: see [LICENSE](LICENSE). Copyright 2026 alanoo81.
 
-This repository contains **no model weights and no engine code**. It has no AGPL-licensed files.
+This repository contains **no model weights**. Its only engine code is the lossless compact KV cache for
+Morrowmake's engine, under Apache-2.0 (next section). It has no AGPL-licensed files.
+
+## The compact KV cache (Apache-2.0)
+
+`morrowmake/compact-kv/` modifies [Morrowmake/vllm-cmp170hx](https://github.com/Morrowmake/vllm-cmp170hx) at
+`a0c57b52`, a fork of vLLM, which is **Apache-2.0** (copyright the vLLM contributors and Morrowmake). These files
+are therefore Apache-2.0, not MIT; the licence text is [`morrowmake/compact-kv/LICENSE`](morrowmake/compact-kv/LICENSE).
+
+| File here | Nature |
+|---|---|
+| `morrowmake/compact-kv/compact-kv.patch` | Unified diff of six files of `vllm/models/deepseek_v41/nvidia/` (`sm80_attention.py`, `ops/sm80_attn_core.py`, `ops/sm80_attn_pipeline.py`, `ops/sm80_sparse_attn.py`, `ops/sm80_attn_fused.py`, `ops/sm80_index_scores.py`). It contains context lines copied from those files. Our changes: packed cache rows, their read and write paths, the index-key rows inside the latent rows |
+| `morrowmake/compact-kv/vllm/models/deepseek_v41/nvidia/ops/sm80_kv_pack.py` | New file, ours, under the same licence as the files it plugs into |
+| `morrowmake/compact-kv/build-overlay.sh` | Ours. It extracts the six original files from Morrowmake's published image at run time and applies the patch; the originals are not copied here |
+
+`build-overlay.sh` and the tests in `morrowmake/compact-kv/tests/` are ours (MIT).
+
+## Files derived from the Morrowmake recipe (MIT)
+
+`morrowmake/start.sh.patch` and `morrowmake/prepare.sh.patch` are unified diffs of
+[Morrowmake/dsv41-flash-cmp170hx-recipe](https://github.com/Morrowmake/dsv41-flash-cmp170hx-recipe) 1.0.0
+(`7f9023cd`), MIT, Copyright (c) 2026 Morrowmake, with context lines from its files. Our changes are MIT.
 
 ## Files derived from upstream
 
