@@ -1,6 +1,6 @@
 --- a/docker/prepare.sh
 +++ b/docker/prepare.sh
-@@ -60,7 +60,7 @@
+@@ -62,7 +62,7 @@
  # sha256 of the files the build writes, as validated. The same inputs always
  # give the same bytes; anything else is not the validated checkpoint.
  HYBRID_SHA256="config.json=ebc5ca822e4af47f63f7ac5707ea09a5f5af4ea00284912ba0f92a7c3bb7a78f

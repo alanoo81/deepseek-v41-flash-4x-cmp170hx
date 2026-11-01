@@ -1,0 +1,65 @@
+{
+ "label": "m101-kvc-nospec",
+ "ts": 1793562078.2707524,
+ "c1-3k": {
+  "prompt_tokens": 3464,
+  "decode_median": 73.83330423731515,
+  "ttft_median": 0.9658227059999263,
+  "prefill_rate_median": 3586.5795849287733,
+  "gen": [
+   97,
+   256,
+   253
+  ]
+ },
+ "c1-32k": {
+  "prompt_tokens": 32955,
+  "decode_median": 72.7932867421319,
+  "ttft_median": 8.632526250999945,
+  "prefill_rate_median": 3817.5383476166867,
+  "gen": [
+   256,
+   161,
+   192
+  ]
+ },
+ "c1-64k": {
+  "prompt_tokens": 65882,
+  "decode_median": 72.6519269268781,
+  "ttft_median": 18.141646493999815,
+  "prefill_rate_median": 3631.534031511235,
+  "gen": [
+   256,
+   256
+  ]
+ },
+ "c1-128k": {
+  "prompt_tokens": 131734,
+  "decode_median": 71.86260812845265,
+  "ttft_median": 40.10944291750002,
+  "prefill_rate_median": 3284.3875110598447,
+  "gen": [
+   198,
+   256
+  ]
+ },
+ "c1-256k": {
+  "prompt_tokens": 259295,
+  "decode_median": 69.86293556388674,
+  "ttft_median": 93.03993853049951,
+  "prefill_rate_median": 2786.9324314358637,
+  "gen": [
+   183,
+   256
+  ]
+ },
+ "c4": {
+  "aggregate": 72.34626151609034,
+  "decode_per_stream_median": 31.598039667799448
+ },
+ "c8": {
+  "aggregate": 71.724245724135,
+  "decode_per_stream_median": 16.75953399864999
+ },
+ "prefix_hit_rate": 0.0
+}

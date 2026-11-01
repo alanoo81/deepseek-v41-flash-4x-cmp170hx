@@ -7,15 +7,15 @@ quatre cartes NVIDIA CMP 170HX (sm_80, 64 Go chacune, PCIe Gen2 x16), et nous pr
 d'origine plutôt que la vitesse brute. Chaque choix ci-dessous a été mesuré sur cette machine contre son alternative,
 par perplexité appariée sur des textes figés, avec les données brutes publiées.
 
-Ce que nous servons aujourd'hui (31/10/2026) :
+Ce que nous servons aujourd'hui (01/11/2026) :
 
-- **Le moteur de [Morrowmake](https://github.com/Morrowmake/dsv41-flash-cmp170hx-recipe), version 1.0.0** : il
+- **Le moteur de [Morrowmake](https://github.com/Morrowmake/dsv41-flash-cmp170hx-recipe), version 1.0.1** : il
   reproduit l'arrondi des caches d'attention du modèle de référence, et cela se voit à partir de 32k jetons.
 - **Les experts routés des couches 18 à 22 greffés de 2 à 3 bits** : le plus gros gain de qualité que nous ayons
   trouvé.
 - **Un cache KV compact sans perte, de notre cru** : les mêmes bits que le cache BF16 de Morrowmake, dans la moitié
   de la mémoire.
-- **Le décodage spéculatif DSpark activé** : il génère le même texte, 2 à 3,7 fois plus vite pour un utilisateur.
+- **Le décodage spéculatif DSpark activé** : il génère le même texte, 2 à 3,6 fois plus vite pour un utilisateur.
 
 Le dépôt contient des correctifs, des outils, des tests, les données brutes des mesures et la documentation. Il ne
 contient aucun poids ; son seul code de moteur est le cache KV compact, sous forme de correctif du moteur de
@@ -25,15 +25,15 @@ Morrowmake.
 
 | | Mesuré sur cette machine, mêmes outils pour chaque pile |
 |---|---|
-| Qualité contre **Morrowmake 1.0.0** tel que publié | **-1,81 %** de perplexité (français **-4,45 %**), **-2,31 %** sur de la prose de 32k jetons |
-| Qualité contre **GNmac-lab 1.2.0** tel que publié | **-1,66 %** de perplexité (français **-4,15 %**), **-2,87 %** sur de la prose de 32k jetons |
-| Autres langues, contre Morrowmake | allemand **-3,03 %** ; italien -0,77 %, porté par ses deux livres les plus connus ([détails](#comparatifs-de-qualité)) |
-| Cache KV compact | log-probabilités **identiques au bit près** sur 1,39 M jetons ; réserve KV **x1,99** contre les lignes BF16 de Morrowmake à poids égaux (1,60 M → 3,19 M jetons sans DSpark, 1,36 M avec) |
-| Réserve KV contre Morrowmake tel que publié | **+9 %** avec DSpark (1 360 109 contre 1 247 657 jetons), **+48 %** sans (3 189 000 contre 2 154 551) |
-| Vitesse, un utilisateur (protocole MiaAI, structuré / code / prose) | **267 / 212 / 153 jetons/s** avec DSpark, 72 sans |
-| Vitesse, 8 utilisateurs, cumulée | **570 / 291 / 349 jetons/s** avec DSpark |
+| Qualité contre **Morrowmake 1.0.1** tel que publié | **-1,76 %** de perplexité (français **-4,39 %**), **-2,28 %** sur de la prose de 32k jetons |
+| Qualité contre **GNmac-lab 1.2.0** tel que publié | **-1,63 %** de perplexité (français **-4,09 %**), **-2,83 %** sur de la prose de 32k jetons |
+| Autres langues, contre Morrowmake | allemand **-3,06 %** ; italien -0,98 %, porté par ses deux livres les plus connus ([détails](#comparatifs-de-qualité)) |
+| Cache KV compact | log-probabilités **identiques au bit près** sur 1,39 M jetons ; réserve KV **x1,99** contre les lignes BF16 de Morrowmake à poids égaux (1,56 M → 3,09 M jetons sans DSpark, 1,47 M avec) |
+| Réserve KV contre Morrowmake tel que publié | **+13 %** avec DSpark (1 466 159 contre 1 296 145 jetons), **+47 %** sans (3 090 900 contre 2 105 722) |
+| Vitesse, un utilisateur (protocole MiaAI, structuré / code / prose) | **288 / 251 / 155 jetons/s** avec DSpark, 79 sans |
+| Vitesse, 8 utilisateurs, cumulée | **639 / 307 / 362 jetons/s** avec DSpark |
 | Longs prompts | premier jeton en **93 s à 259k jetons** |
-| Contexte de 1M jetons (profil séparé, sans DSpark) | rappel exact de 8 codes cachés : **8 / 8 à 997k jetons** (premier jeton après 12 min) ; réserve KV de 4,2 M jetons ([résultats](docs/results.md#5-contexts-beyond-262144-tokens)) |
+| Contexte de 1M jetons (profil séparé, sans DSpark) | rappel exact de 8 codes cachés : **8 / 8 à 997k jetons** (premier jeton après 12 min) ; réserve KV de 4,06 M jetons ([résultats](docs/results.md#5-contexts-beyond-262144-tokens)) |
 
 ## Comparatifs de qualité
 
@@ -47,21 +47,21 @@ prédit mieux le texte. La « prose 32k » compte 8 fenêtres en français, 8 en
 
 | Recette → nous | Fenêtres de 1 024 | Fenêtres de 40 | Prose 32k | Code 32k |
 |---|---|---|---|---|
-| **Morrowmake 1.0.0** | **-1,81 % [-2,01 ; -1,61]** | -0,49 % [-0,84 ; -0,13] | **-2,31 % [-2,75 ; -1,79]** | -0,06 % [-0,12 ; -0,00] |
-| **GNmac-lab 1.2.0** | **-1,66 % [-1,89 ; -1,43]** | -0,78 % [-1,20 ; -0,35] | **-2,87 % [-3,40 ; -2,26]** | non mesuré |
+| **Morrowmake 1.0.1** | **-1,76 % [-1,97 ; -1,55]** | -0,23 % [-0,57 ; +0,12] | **-2,28 % [-2,70 ; -1,75]** | -0,06 % [-0,11 ; -0,02] |
+| **GNmac-lab 1.2.0** | **-1,63 % [-1,85 ; -1,40]** | -0,34 % [-0,77 ; +0,09] | **-2,83 % [-3,36 ; -2,21]** | non mesuré |
 
 **Autres langues** (Morrowmake tel que publié → nous, 64 fenêtres de 1 024 jetons tirées de 8 livres Gutenberg par
 langue) :
 
 | Langue | Écart | Fenêtres où nous faisons mieux |
 |---|---|---|
-| Français | **-4,45 % [-4,97 ; -3,94]** | 64 sur 64 |
-| Allemand | **-3,03 % [-3,71 ; -2,37]** | 56 sur 64, chaque livre mieux |
-| Anglais | -0,69 % [-0,96 ; -0,44] | 44 sur 64 |
-| Italien | -0,77 % [-1,36 ; -0,22] | 30 sur 64 |
+| Français | **-4,39 % [-4,94 ; -3,83]** | 63 sur 64 |
+| Allemand | **-3,06 % [-3,78 ; -2,35]** | 54 sur 64, chaque livre mieux |
+| Anglais | -0,68 % [-0,94 ; -0,45] | 47 sur 64 |
+| Italien | -0,98 % [-1,63 ; -0,38] | 29 sur 64 |
 
-Le gain en italien vient de ses deux livres les plus connus (*I promessi sposi* -4,4 %, *Pinocchio* -3,9 %, 8 fenêtres
-sur 8 chacun) ; les six romans moins connus bougent de -0,1 à +0,55 %, un peu moins bien dans l'ensemble.
+Le gain en italien vient de ses deux livres les plus connus (*I promessi sposi* -5,2 %, *Pinocchio* -4,5 %, 8 fenêtres
+sur 8 chacun) ; les six romans moins connus bougent de -0,2 à +0,63 %, un peu moins bien dans l'ensemble.
 *Interprétation :* une partie de ce que la greffe rétablit pourrait être le rappel de textes vus à l'entraînement ;
 ces mesures ne permettent pas de dire quelle part.
 
@@ -69,20 +69,23 @@ ces mesures ne permettent pas de dire quelle part.
 
 | A → B | Fenêtres de 1 024 | Fenêtres de 40 | Prose 32k | Code 32k |
 |---|---|---|---|---|
-| Greffe des couches 18-22, 2 → 3 bits (moteur Morrowmake) | **-1,81 % [-2,01 ; -1,61]** | -0,49 % [-0,84 ; -0,13] | **-2,31 % [-2,75 ; -1,79]** | -0,06 % [-0,12 ; -0,00] |
-| Moteur GNmac → moteur Morrowmake, mêmes poids publiés | +0,15 % [+0,02 ; +0,29] | -0,29 % [-0,59 ; +0,02] | **-0,57 % [-0,73 ; -0,42]** | non mesuré |
-| Moteur GNmac → moteur Morrowmake avec notre cache compact, mêmes poids (greffés des deux côtés) | +0,14 % [+0,03 ; +0,26] | -0,21 % [-0,52 ; +0,11] | **-0,58 % [-0,74 ; -0,43]** | **-1,64 % [-1,92 ; -1,37]** |
+| Greffe des couches 18-22, 2 → 3 bits (moteur Morrowmake) | **-1,76 % [-1,97 ; -1,55]** | -0,23 % [-0,57 ; +0,12] | **-2,28 % [-2,70 ; -1,75]** | -0,06 % [-0,11 ; -0,02] |
+| Moteur GNmac → moteur Morrowmake, mêmes poids publiés | +0,14 % [+0,02 ; +0,25] | -0,12 % [-0,44 ; +0,20] | **-0,57 % [-0,73 ; -0,42]** | non mesuré |
+| Moteur GNmac → moteur Morrowmake avec notre cache compact, mêmes poids (greffés des deux côtés) | +0,17 % [+0,06 ; +0,30] | +0,23 % [-0,09 ; +0,55] | **-0,54 % [-0,70 ; -0,38]** | **-1,62 % [-1,89 ; -1,35]** |
 | Cache KV compact (lignes BF16 de Morrowmake → lignes compactes) | identique | identique | identique | identique |
-| Couches 36-39, 3 → 4 bits | -0,04 % [-0,08 ; +0,01] | -0,08 % [-0,22 ; +0,07] | -0,11 % [-0,15 ; -0,07] | -0,11 % [-0,14 ; -0,09] |
+| Couches 36-39, 3 → 4 bits (sur 1.0.0) | -0,04 % [-0,08 ; +0,01] | -0,08 % [-0,22 ; +0,07] | -0,11 % [-0,15 ; -0,07] | -0,11 % [-0,14 ; -0,09] |
 | Couches 0, 1, 3, 6, 3 → 4 bits (moteur GNmac) | +0,08 % [-0,01 ; +0,18] | -0,02 % [-0,30 ; +0,25] | non mesuré | non mesuré |
-| Raccourcis de la release Morrowmake désactivés | +0,04 % [-0,05 ; +0,13] | non mesuré | non mesuré | +0,00 % [-0,04 ; +0,05] |
+| Raccourcis de la release Morrowmake désactivés (sur 1.0.0) | +0,04 % [-0,05 ; +0,13] | non mesuré | non mesuré | +0,00 % [-0,04 ; +0,05] |
 
 Ce que disent les tableaux :
 
 - **Contre Morrowmake, tout le gain vient de la greffe.** Même moteur, même image ; le cache compact ne change
   aucun bit. Morrowmake livre les couches 18-22 en 2 bits, les seules du pack. En 3 bits elles rapportent 1,8 % au
-  global, 4,5 à 4,8 % en français à toutes les longueurs, et peu sur le code.
-- **Contre GNmac, le moteur s'ajoute à la greffe.** À poids égaux, le moteur de Morrowmake a 0,15 % de retard sur
+  global, 4,4 à 4,7 % en français à partir de 1 024 jetons, et peu sur le code.
+- **Les prompts très courts gagnent peu.** Sur les fenêtres de 40 jetons, le gain reste dans le bruit sur la 1.0.1
+  (-0,23 % ; anglais -0,99 % [-1,57 ; -0,40], français -0,02 %, code +0,33 %). Il était de -0,49 % sur la 1.0.0 ; nous
+  n'avons pas trouvé ce qui l'a fait bouger ([results.md, 2.5](docs/results.md#25-from-morrowmake-100-to-101)).
+- **Contre GNmac, le moteur s'ajoute à la greffe.** À poids égaux, le moteur de Morrowmake a 0,14 % de retard sur
   celui de GNmac en fenêtres de 1 024 jetons, et prend l'avantage à partir de 32k : 0,6 % sur la prose, 1,6 % sur
   le code (16 fenêtres sur 16). *Interprétation :* Morrowmake reproduit l'arrondi FP4 de référence du cache
   compressé et des clés de l'indexeur, là où GNmac stocke des enregistrements FP8 ; l'indexeur choisit quelles
@@ -94,20 +97,20 @@ Ce que disent les tableaux :
 Détails, lignes par langue et fichiers de données : [docs/results.md](docs/results.md#2-quality) et
 [docs/comparison-morrowmake.md](docs/comparison-morrowmake.md).
 
-## Contre Morrowmake 1.0.0, en bref
+## Contre Morrowmake 1.0.1, en bref
 
 Nous servons l'image même de Morrowmake. Ce qui change, mesuré sur la même machine
 ([docs/comparison-morrowmake.md](docs/comparison-morrowmake.md)) :
 
-| | Morrowmake 1.0.0 tel que publié | Nous |
+| | Morrowmake 1.0.1 tel que publié | Nous |
 |---|---|---|
 | Couches 18-22 | experts en 2 bits | experts en 3 bits (+1,98 Gio par carte) |
 | Caches d'attention compressée | lignes BF16 (1 280 octets par position) | lignes compactes, mêmes bits (512 octets) |
-| Perplexité, fenêtres de 1 024 / 32k jetons | référence | **-1,81 % / -2,31 %** (français -4,45 % / -4,79 %) |
-| Réserve KV, avec / sans DSpark | 1 247 657 / 2 154 551 | **1 360 109 / 3 189 000** |
-| Vitesse avec DSpark, 1 utilisateur, structuré / prose | 276 / 151 jetons/s | 267 / 153 jetons/s (-3 % / +1 %) |
-| Vitesse avec DSpark, 8 utilisateurs, structuré / prose | 585 / 353 jetons/s | 570 / 349 jetons/s (-2,5 % / -1 %) |
-| Premier jeton d'un prompt de 259k jetons | 85 s | 93 s |
+| Perplexité, fenêtres de 1 024 / 32k jetons | référence | **-1,76 % / -2,28 %** (français -4,39 % / -4,72 %) |
+| Réserve KV, avec / sans DSpark | 1 296 145 / 2 105 722 | **1 466 159 / 3 090 900** |
+| Vitesse avec DSpark, 1 utilisateur, structuré / prose | 297 / 158 jetons/s | 288 / 155 jetons/s (-3 % / -2 %) |
+| Vitesse avec DSpark, 8 utilisateurs, structuré / prose | 624 / 377 jetons/s | 639 / 362 jetons/s (+2 % / -4 %) |
+| Premier jeton d'un prompt de 259k jetons | 88 s | 93 s |
 | Contexte de 1M jetons | non validé | rappel 8 / 8 à 997k jetons (profil séparé) |
 | Installation | `install.sh`, `download.sh` | plus 24 Gio de shards donneurs, l'outil de greffe, une empreinte, l'overlay |
 
@@ -127,16 +130,19 @@ Nous servons l'image même de Morrowmake. Ce qui change, mesuré sur la même ma
      que les noyaux de Morrowmake tournent sans modification et que l'identité tient par construction (décodage -2
      à -5 %, lecture de prompt -6 à -10 %) ;
    - v1.5 : les clés de l'indexeur passent dans les lignes du latent (+16 % de réserve en plus).
+
+   Le passage à Morrowmake 1.0.1 n'a changé que des chemins d'import, et les deux contrôles de validation sont
+   repassés.
 3. **Le moteur, choisi sur les contextes longs.** À 1 024 jetons le moteur de GNmac est légèrement devant ; à partir
    de 32k c'est celui de Morrowmake. Une comparaison arrêtée aux fenêtres courtes aurait désigné l'autre.
-4. **DSpark gardé.** Mêmes 768 jetons générés à l'auto-contrôle, log-probabilités de décodage à moins de 2e-5 ;
-   vitesse pour un utilisateur x2,1 à x3,7. Le profil sans DSpark reste disponible pour une réserve de 3,19 M jetons.
+4. **DSpark gardé.** Mêmes 768 jetons générés à l'auto-contrôle ; vitesse pour un utilisateur x2,0 à x3,6. Le profil
+   sans DSpark reste disponible pour une réserve de 3,09 M jetons.
 5. **Contextes jusqu'à 1M jetons, en profil séparé.** Sans DSpark, `--max-model-len 1048576` : 8 codes cachés sur 8
-   restitués exactement à 131k, 522k et 997k jetons. Un maximum de 1M ralentit toutes les requêtes de 21 à 25 %, d'où
+   restitués exactement à 131k, 522k et 997k jetons. Un maximum de 1M ralentit toutes les requêtes de 19 à 31 %, d'où
    un profil à part plutôt que le réglage par défaut.
 6. **Mesuré et écarté :** experts en 4 bits (deux essais, 0,1 % au plus, -12 à -17 % de vitesse) ; raccourcis
    numériques de Morrowmake désactivés (aucun écart mesurable, 2,3 fois plus lent) ; réglage mémoire à 0,98 (mêmes
-   bits, manque de mémoire) ([docs/results.md, section 6](docs/results.md#6-settings-we-tried-and-rejected)).
+   bits, manque de mémoire), le tout sur la 1.0.0 ([docs/results.md, section 6](docs/results.md#6-settings-we-tried-and-rejected)).
 
 ## Comment fonctionne le cache KV compact
 
@@ -170,8 +176,9 @@ caches. L'indexeur lit ses clés à travers une vue des lignes du latent : son p
 
 **Comment nous l'avons vérifié.** Un test unitaire sur GPU compare chaque bit de sortie de chaque noyau qui lit ou
 écrit ces caches avec le chemin BF16, aux tailles réelles de service ; puis les log-probabilités du modèle servi sont
-comparées jeton par jeton avec le cache BF16 de Morrowmake : 1,39 M jetons, 0 différent. Trois versions (exacte mais
-lente, puis rapide, puis une ligne par position) ont chacune passé les deux contrôles. Conception complète, exemple
+comparées jeton par jeton avec le cache BF16 de Morrowmake : 1,39 M jetons, 0 différent, sur la 1.0.0 puis de nouveau
+sur la 1.0.1. Trois versions (exacte mais lente, puis rapide, puis une ligne par position) ont chacune passé les deux
+contrôles. Conception complète, exemple
 chiffré et historique : [docs/compact-kv-cache.md](docs/compact-kv-cache.md).
 
 ## Vitesse
@@ -181,18 +188,23 @@ jetons/s, structuré / code / prose :
 
 | | 1 utilisateur | 8 utilisateurs, cumulé |
 |---|---|---|
-| **Nous** (Morrowmake + greffe + cache compact + DSpark) | **267 / 212 / 153** | **570 / 291 / 349** |
-| Nous, sans DSpark | 72 / 73 / 72 | 397 / 245 / 341 |
-| Morrowmake 1.0.0 tel que publié, DSpark | 276 / 217 / 151 | 585 / 355 / 353 |
+| **Nous** (Morrowmake + greffe + cache compact + DSpark) | **288 / 251 / 155** | **639 / 307 / 362** |
+| Nous, sans DSpark | 79 / 80 / 79 | 421 / 253 / 345 |
+| Morrowmake 1.0.1 tel que publié, DSpark | 297 / 235 / 158 | 624 / 378 / 377 |
 | Moteur GNmac-lab 1.2.0, DSpark, mêmes poids que nous | 366 / 268 / 202 | 884 / 563 / 476 |
 | Moteur GNmac-lab 1.2.0, sans DSpark, mêmes poids que nous | 105 / 105 / 105 | 560 / 482 / 449 |
 
-- **Contre Morrowmake tel que publié, nous perdons 1 à 3 %** en décodage et 5 à 9 % en lecture de prompt : c'est
-  le coût du cache compact, la greffe ne coûte rien de mesurable ici.
-- **Le moteur de GNmac est plus rapide**, d'environ 1,45 fois pour un flux sans DSpark et 1,3 à 1,4 fois avec.
-  Nous avons échangé cette vitesse contre la qualité en contexte long.
-- **Comparez sur les colonnes structuré et prose.** Notre configuration répond au prompt de code en 48 jetons,
-  toutes les autres piles en 95 : cette colonne ne mesure pas le même travail.
+- **Contre Morrowmake tel que publié**, le décodage va de -4 % à +2 % sur le structuré et la prose, et la lecture de
+  prompt est 3 à 6 % plus lente. *Interprétation :* c'est le coût du cache compact ; sur la 1.0.0, où nous les avons
+  mesurés séparément, la greffe ne coûtait rien de mesurable.
+- **Le moteur de GNmac est plus rapide**, d'environ 1,3 fois pour un flux avec ou sans DSpark, et de 1,3 à 1,4 fois à
+  8 utilisateurs avec DSpark. Nous avons échangé cette vitesse contre la qualité en contexte long.
+- **Comparez sur les colonnes structuré et prose.** Seuls, Morrowmake 1.0.1 et nous répondons au prompt de code en 48
+  jetons, GNmac en 95. En lots, les réponses gloutonnes diffèrent encore (à 8 utilisateurs, 760 jetons au total pour
+  Morrowmake, 478 pour nous) : cette colonne ne mesure pas le même travail.
+- **Nous ne retrouvons pas les chiffres à 8 utilisateurs publiés par Morrowmake** (868 / 795 / 464 sur sa machine,
+  624 / 378 / 377 ici ; à un utilisateur 297 / 297 / 170 contre 297 / 235 / 158). L'écart existait déjà en 1.0.0 (760
+  contre 585 en structuré). Nous ne savons pas quelle part vient de la machine et quelle part de la méthode.
 - Morrowmake lit les longs prompts 1,4 à 1,7 fois plus vite que GNmac : le premier jeton d'un prompt de 259k jetons
   arrive après 93 s au lieu de 159 s.
 - Décodage en contexte long et réserves KV : [docs/results.md](docs/results.md#4-speed).
@@ -203,20 +215,20 @@ jetons/s, structuré / code / prose :
 |---|---|
 | Matériel | ASRock Rack ROMED8-2T, AMD EPYC 7F52, 512 Go DDR4-3200 (8 canaux), 4x CMP 170HX 64 Go en PCIe Gen2 x16, 200 W, 170tune +200 MHz @ 1500 MHz |
 | Pilote | pilote ouvert NVIDIA 610.43.02 avec un fork de cmpunlocker et un correctif P2P ; le contrôle P2P de Morrowmake passe sans son correctif TRAP31 |
-| Moteur | Morrowmake 1.0.0 (`7f9023cd`), image `ghcr.io/morrowmake/vllm-cmp170hx@sha256:f67d9be4…` (moteur `a0c57b52`), inchangée sauf les sept fichiers du cache compact montés par-dessus |
+| Moteur | Morrowmake 1.0.1 (tag `v1.0.1`, `f6643be`), image `ghcr.io/morrowmake/vllm-cmp170hx@sha256:32ae8b0e…` (vLLM `330c5bff`, queue `e05403fd`, greffon `vllm_sm80` `0b34823c`), inchangée sauf les sept fichiers du cache compact montés par-dessus |
 | Poids | tenseurs officiels FP8 hors experts et tables Engram (`deepseek-ai/DeepSeek-V4.1-Flash-1017` @ `1bae0e10`) ; experts routés du pack 2,9 bpw de LibertAI (révision épinglée par Morrowmake), couches 18-22 du pack 3,5 bpw de LibertAI @ `04a492fc` |
 | Cache KV | compact v1.5 (`VLLM_SM80_COMPACT_KV=1`), cache de préfixes activé |
 | Service | TP 4, contexte de 262 144 jetons, 8 séquences, DSpark (7 jetons proposés), réglage mémoire 0,95, tables Engram en RAM |
-| Réserve KV | 1 360 109 jetons (5,2 requêtes de longueur maximale) ; 3 189 000 sans DSpark |
+| Réserve KV | 1 466 159 jetons (5,6 requêtes de longueur maximale) ; 3 090 900 sans DSpark |
 | API | analyseurs d'appels d'outils et de raisonnement `deepseek_v41`, clé d'API obligatoire, `/health` ouvert |
 
 ## Organisation du dépôt
 
 ```
-morrowmake/                       la configuration actuelle, au-dessus de Morrowmake 1.0.0
+morrowmake/                       la configuration actuelle, au-dessus de Morrowmake 1.0.1
   compact-kv/                     cache KV compact sans perte (fichiers de moteur sous Apache-2.0)
     compact-kv.patch              modifications de six fichiers du moteur
-    vllm/.../ops/sm80_kv_pack.py  compactage, décompactage, chargements et écritures Triton
+    vllm_sm80/.../sm80_kv_pack.py compactage, décompactage, chargements et écritures Triton
     build-overlay.sh              construit kvc-overlay/ depuis l'image épinglée + le correctif
     tests/test_gpu.py             test unitaire d'identité au bit près sur GPU ; tests/bench_gpu.py : temps des noyaux
   tools/graft_layers.py           greffe des couches d'un autre pack EXL3 dans le checkpoint exporté
@@ -249,12 +261,12 @@ La documentation détaillée est en anglais.
 
 Étapes complètes avec leurs vérifications : [docs/setup.md](docs/setup.md).
 
-1. Installer Morrowmake 1.0.0 (`7f9023cd`) et le lancer une fois tel quel.
+1. Installer Morrowmake 1.0.1 (tag `v1.0.1`) et le lancer une fois tel quel.
 2. Télécharger les cinq shards donneurs du pack 3,5 bpw de LibertAI, lancer `morrowmake/tools/graft_layers.py`,
    appliquer `prepare.sh.patch`, reconstruire l'hybride.
 3. Lancer `morrowmake/compact-kv/build-overlay.sh`, appliquer `start.sh.patch`, régler `VLLM_SM80_COMPACT_KV=1`,
    passer le test unitaire GPU.
-4. `./start-dspark.sh`. Le journal doit annoncer une réserve KV de 1 360 109 jetons.
+4. `./start-dspark.sh`. Le journal doit annoncer une réserve KV de 1 466 159 jetons.
 
 ## Méthode
 
@@ -267,7 +279,7 @@ quantification, budgets de VRAM, diagnostic Engram).
 
 ## Remerciements
 
-- [Morrowmake/dsv41-flash-cmp170hx-recipe](https://github.com/Morrowmake/dsv41-flash-cmp170hx-recipe) 1.0.0 et
+- [Morrowmake/dsv41-flash-cmp170hx-recipe](https://github.com/Morrowmake/dsv41-flash-cmp170hx-recipe) 1.0.1 et
   [Morrowmake/vllm-cmp170hx](https://github.com/Morrowmake/vllm-cmp170hx) : le moteur et la recette que nous servons.
 - [GNmac-lab/deepseek-v41-flash-1017-cmp170hx](https://github.com/GNmac-lab/deepseek-v41-flash-1017-cmp170hx) 1.2.0 :
   l'autre recette que nous avons mesurée, et la base de nos premières mesures.
@@ -287,7 +299,7 @@ quantification, budgets de VRAM, diagnostic Engram).
 ## Licences
 
 - **Ce dépôt** est sous licence MIT ([LICENSE](LICENSE)), **sauf les fichiers de moteur de `morrowmake/compact-kv/`**
-  (`compact-kv.patch` et `sm80_kv_pack.py`), qui modifient le fork vLLM de Morrowmake, sous Apache-2.0, et sont donc
+  (`compact-kv.patch` et `sm80_kv_pack.py`), qui modifient le greffon du fork vLLM de Morrowmake, sous Apache-2.0, et sont donc
   sous Apache-2.0 ([leur LICENSE](morrowmake/compact-kv/LICENSE)).
   [NOTICE.md](NOTICE.md) liste chaque fichier dérivé d'un autre projet.
 - **Les poids** ne sont pas inclus : ceux de DeepSeek et les packs de LibertAI sont sous MIT, selon les conditions de
