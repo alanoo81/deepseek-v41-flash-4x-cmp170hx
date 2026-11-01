@@ -1,12 +1,11 @@
-diff -ruN a/vllm/models/deepseek_v41/nvidia/ops/sm80_attn_core.py b/vllm/models/deepseek_v41/nvidia/ops/sm80_attn_core.py
---- a/vllm/models/deepseek_v41/nvidia/ops/sm80_attn_core.py
-+++ b/vllm/models/deepseek_v41/nvidia/ops/sm80_attn_core.py
+--- a/vllm_sm80/models/deepseek_v41/ops/sm80_attn_core.py
++++ b/vllm_sm80/models/deepseek_v41/ops/sm80_attn_core.py
 @@ -56,6 +56,7 @@
  
  import torch
  
-+from vllm.models.deepseek_v41.nvidia.ops import sm80_kv_pack as kv_pack
- from vllm.models.deepseek_v41.nvidia.ops.sm80_act_quant import qdq_fp4, qdq_fp8
++from vllm_sm80.models.deepseek_v41.ops import sm80_kv_pack as kv_pack
+ from vllm_sm80.models.deepseek_v41.ops.sm80_act_quant import qdq_fp4, qdq_fp8
  
  FLT_MAX = torch.finfo(torch.float32).max
 @@ -247,11 +248,12 @@
@@ -58,18 +57,17 @@ diff -ruN a/vllm/models/deepseek_v41/nvidia/ops/sm80_attn_core.py b/vllm/models/
  
  
  # ---------------------------------------------------------------------------
-diff -ruN a/vllm/models/deepseek_v41/nvidia/ops/sm80_attn_fused.py b/vllm/models/deepseek_v41/nvidia/ops/sm80_attn_fused.py
---- a/vllm/models/deepseek_v41/nvidia/ops/sm80_attn_fused.py
-+++ b/vllm/models/deepseek_v41/nvidia/ops/sm80_attn_fused.py
-@@ -38,6 +38,7 @@
+--- a/vllm_sm80/models/deepseek_v41/ops/sm80_attn_fused.py
++++ b/vllm_sm80/models/deepseek_v41/ops/sm80_attn_fused.py
+@@ -45,6 +45,7 @@
  import torch
  from triton.language.extra import libdevice
  
-+from vllm.models.deepseek_v41.nvidia.ops import sm80_kv_pack as kv_pack
- from vllm.models.deepseek_v41.nvidia.ops.sm80_act_quant import qdq_fp8_tile
++from vllm_sm80.models.deepseek_v41.ops import sm80_kv_pack as kv_pack
+ from vllm_sm80.models.deepseek_v41.ops.sm80_act_quant import qdq_fp8_tile
  from vllm.triton_utils import tl, triton
  
-@@ -386,6 +387,10 @@
+@@ -594,6 +595,10 @@
      assert q.stride(2) == 1 and swa_cache.stride(2) == 1
      assert swa_indices.stride(1) == 1
      has_comp = comp_local is not None and comp_local.shape[1] > 0
@@ -80,18 +78,17 @@ diff -ruN a/vllm/models/deepseek_v41/nvidia/ops/sm80_attn_fused.py b/vllm/models
      if has_comp:
          assert comp_cache is not None and comp_block_table is not None
          assert comp_cache.stride(2) == 1 and comp_local.stride(1) == 1
-diff -ruN a/vllm/models/deepseek_v41/nvidia/ops/sm80_attn_pipeline.py b/vllm/models/deepseek_v41/nvidia/ops/sm80_attn_pipeline.py
---- a/vllm/models/deepseek_v41/nvidia/ops/sm80_attn_pipeline.py
-+++ b/vllm/models/deepseek_v41/nvidia/ops/sm80_attn_pipeline.py
+--- a/vllm_sm80/models/deepseek_v41/ops/sm80_attn_pipeline.py
++++ b/vllm_sm80/models/deepseek_v41/ops/sm80_attn_pipeline.py
 @@ -11,6 +11,7 @@
  import torch
  from triton.language.extra import libdevice
  
-+from vllm.models.deepseek_v41.nvidia.ops import sm80_kv_pack as kv_pack
- from vllm.models.deepseek_v41.nvidia.ops.sm80_act_quant import qdq_fp4_tile
- from vllm.models.deepseek_v41.nvidia.ops.sm80_index_scores import score_tile
- from vllm.models.deepseek_v41.nvidia.ops.sm80_index_topk import (
-@@ -87,16 +88,20 @@
++from vllm_sm80.models.deepseek_v41.ops import sm80_kv_pack as kv_pack
+ from vllm_sm80.models.deepseek_v41.ops.sm80_act_quant import qdq_fp4_tile
+ from vllm_sm80.models.deepseek_v41.ops.sm80_index_scores import score_tile
+ from vllm_sm80.models.deepseek_v41.ops.sm80_index_topk import (
+@@ -91,16 +92,20 @@
                                    ce: tl.constexpr, E: tl.constexpr,
                                    rb: tl.constexpr, re: tl.constexpr,
                                    CAP: tl.constexpr, D: tl.constexpr,
@@ -115,7 +112,7 @@ diff -ruN a/vllm/models/deepseek_v41/nvidia/ops/sm80_attn_pipeline.py b/vllm/mod
      elif RATIO == 2:
          # Only unique last-capacity raw rows may update the state ring.
          r = tl.load(req + t).to(tl.int64)
-@@ -117,7 +122,8 @@
+@@ -121,7 +126,8 @@
                             kb: tl.constexpr, ke: tl.constexpr, E: tl.constexpr,
                             H: tl.constexpr, IH: tl.constexpr, D: tl.constexpr,
                             ID: tl.constexpr, RD: tl.constexpr,
@@ -125,7 +122,7 @@ diff -ruN a/vllm/models/deepseek_v41/nvidia/ops/sm80_attn_pipeline.py b/vllm/mod
      t = tl.program_id(0).to(tl.int64)
      part = tl.program_id(1)
      p = tl.load(pos + t)
-@@ -142,10 +148,14 @@
+@@ -146,10 +152,14 @@
              inv = libdevice.rsqrt(tl.sum(x * x, 0) / ID + eps)
              x = (tl.load(knorm + d).to(tl.float32) * (x * inv)).to(tl.bfloat16).to(tl.float32)
              x = _rope_row(x, p + 1 - RATIO, freqs, ID, RD)
@@ -143,7 +140,7 @@ diff -ruN a/vllm/models/deepseek_v41/nvidia/ops/sm80_attn_pipeline.py b/vllm/mod
  
  
  @triton.jit(do_not_specialize=["T"])
-@@ -167,7 +177,8 @@
+@@ -171,7 +181,8 @@
                                E: tl.constexpr, H: tl.constexpr, D: tl.constexpr,
                                HPR: tl.constexpr, CB: tl.constexpr,
                                CK: tl.constexpr, MASK: tl.constexpr,
@@ -153,7 +150,7 @@ diff -ruN a/vllm/models/deepseek_v41/nvidia/ops/sm80_attn_pipeline.py b/vllm/mod
      t = tl.program_id(0).to(tl.int64)
      seg = tl.program_id(1)
      visible = tl.load(nvis + t)
-@@ -190,7 +201,7 @@
+@@ -194,7 +205,7 @@
              total = tl.full((64,), float('-inf'), tl.float32)
              if seg * B + tile * 64 < visible:
                  total = score_tile(q, w, req, cache, bt, t, cols, visible,
@@ -162,7 +159,7 @@ diff -ruN a/vllm/models/deepseek_v41/nvidia/ops/sm80_attn_pipeline.py b/vllm/mod
              if MASK:
                  # Candidate IDs are sorted and -1 padded. Binary search the
                  # sorted valid prefix using -1 as +infinity, without a mask spool.
-@@ -292,7 +303,8 @@
+@@ -319,7 +330,8 @@
          weights.freqs, raw.stride(0), caches.comp.stride(0), caches.comp.stride(1),
          caches.comp.shape[1], ring.stride(0), ring.stride(1),
          caches.ring.shape[1] if caches.ring is not None else 1,
@@ -172,7 +169,7 @@ diff -ruN a/vllm/models/deepseek_v41/nvidia/ops/sm80_attn_pipeline.py b/vllm/mod
  
  
  def query_key_post(cfg, weights, caches, batch, q, iq, iw, k, ws):
-@@ -313,7 +325,7 @@
+@@ -340,7 +352,7 @@
          q.stride(0), q.stride(1), iq.stride(0), iq.stride(1), iw.stride(0),
          k.stride(0), kc.stride(0), kc.stride(1), kc.shape[1],
          cfg.n_local_heads, ih, cfg.head_dim, 128, cfg.rope_dim, cfg.compress_ratio,
@@ -181,7 +178,7 @@ diff -ruN a/vllm/models/deepseek_v41/nvidia/ops/sm80_attn_pipeline.py b/vllm/mod
      return ws.q[:t]
  
  
-@@ -338,7 +350,7 @@
+@@ -365,7 +377,7 @@
          cfg.index_heads_per_rank, cfg.candidate_block_size,
          cfg.candidate_topk_blocks, cfg.uses_candidates and not cfg.is_candidate_source,
          cfg.is_candidate_source, cfg.candidate_topk_blocks.bit_length(),
@@ -190,14 +187,13 @@ diff -ruN a/vllm/models/deepseek_v41/nvidia/ops/sm80_attn_pipeline.py b/vllm/mod
      # Token selection must consume the producer histogram before the candidate
      # selector reuses it. Both use the source's unmasked scores at a source.
      select(scores, ws.nvis[:t], caches.topk[:t], ws.selection, first_histogram=True)
-diff -ruN a/vllm/models/deepseek_v41/nvidia/ops/sm80_index_scores.py b/vllm/models/deepseek_v41/nvidia/ops/sm80_index_scores.py
---- a/vllm/models/deepseek_v41/nvidia/ops/sm80_index_scores.py
-+++ b/vllm/models/deepseek_v41/nvidia/ops/sm80_index_scores.py
+--- a/vllm_sm80/models/deepseek_v41/ops/sm80_index_scores.py
++++ b/vllm_sm80/models/deepseek_v41/ops/sm80_index_scores.py
 @@ -29,6 +29,7 @@
  from vllm.model_executor.warmup.jit_warmup_triton_helper import (
      triton_scalar_specialization_rep,
  )
-+from vllm.models.deepseek_v41.nvidia.ops import sm80_kv_pack as kv_pack
++from vllm_sm80.models.deepseek_v41.ops import sm80_kv_pack as kv_pack
  from vllm.triton_utils import tl, triton
  
  _BLOCK_N = 64
@@ -246,14 +242,13 @@ diff -ruN a/vllm/models/deepseek_v41/nvidia/ops/sm80_index_scores.py b/vllm/mode
          num_warps=4,
      )
      return out
-diff -ruN a/vllm/models/deepseek_v41/nvidia/ops/sm80_sparse_attn.py b/vllm/models/deepseek_v41/nvidia/ops/sm80_sparse_attn.py
---- a/vllm/models/deepseek_v41/nvidia/ops/sm80_sparse_attn.py
-+++ b/vllm/models/deepseek_v41/nvidia/ops/sm80_sparse_attn.py
+--- a/vllm_sm80/models/deepseek_v41/ops/sm80_sparse_attn.py
++++ b/vllm_sm80/models/deepseek_v41/ops/sm80_sparse_attn.py
 @@ -14,10 +14,13 @@
  
  import torch
  
-+from vllm.models.deepseek_v41.nvidia.ops import sm80_kv_pack as kv_pack
++from vllm_sm80.models.deepseek_v41.ops import sm80_kv_pack as kv_pack
  from vllm.triton_utils import tl, triton
  
  _BLOCK_H = 16
@@ -281,18 +276,17 @@ diff -ruN a/vllm/models/deepseek_v41/nvidia/ops/sm80_sparse_attn.py b/vllm/model
      if has_comp:
          assert comp_cache is not None and comp_block_table is not None
          assert comp_cache.stride(2) == 1 and comp_local.stride(1) == 1
-diff -ruN a/vllm/models/deepseek_v41/nvidia/sm80_attention.py b/vllm/models/deepseek_v41/nvidia/sm80_attention.py
---- a/vllm/models/deepseek_v41/nvidia/sm80_attention.py
-+++ b/vllm/models/deepseek_v41/nvidia/sm80_attention.py
-@@ -57,6 +57,7 @@
+--- a/vllm_sm80/models/deepseek_v41/sm80_attention.py
++++ b/vllm_sm80/models/deepseek_v41/sm80_attention.py
+@@ -58,6 +58,7 @@
  )
- from vllm.models.deepseek_v41.nvidia import sm80_swa_meta_batch
- from vllm.models.deepseek_v41.nvidia.ops import sm80_attn_core as core
-+from vllm.models.deepseek_v41.nvidia.ops import sm80_kv_pack as kv_pack
- from vllm.models.deepseek_v41.nvidia.ops import sm80_mhc_side
+ from vllm_sm80.models.deepseek_v41 import sm80_swa_meta_batch
+ from vllm_sm80.models.deepseek_v41.ops import sm80_attn_core as core
++from vllm_sm80.models.deepseek_v41.ops import sm80_kv_pack as kv_pack
+ from vllm_sm80.models.deepseek_v41.ops import sm80_mhc_side
  from vllm.models.deepseek_v41.sparse_mla import (
      DeepseekV4SparseMLABackend,
-@@ -172,9 +173,14 @@
+@@ -169,9 +170,14 @@
  
  
  class Sm80IndexKCache(DeepseekV4IndexerCache):
@@ -310,7 +304,7 @@ diff -ruN a/vllm/models/deepseek_v41/nvidia/sm80_attention.py b/vllm/models/deep
          return MLAAttentionSpec(
              block_size=self.cache_config.block_size,
              num_kv_heads=1,
-@@ -271,6 +277,20 @@
+@@ -268,6 +274,20 @@
          self.k_cache = k_cache
  
  
@@ -331,7 +325,7 @@ diff -ruN a/vllm/models/deepseek_v41/nvidia/sm80_attention.py b/vllm/models/deep
  # ---------------------------------------------------------------------------
  # The attention layer
  # ---------------------------------------------------------------------------
-@@ -317,6 +337,17 @@
+@@ -314,6 +334,17 @@
      def _indexer_cls(self, k_cache) -> type[DeepseekV4Indexer]:
          return DeepseekV41Sm80Indexer
  
@@ -349,7 +343,7 @@ diff -ruN a/vllm/models/deepseek_v41/nvidia/sm80_attention.py b/vllm/models/deep
      def __init__(
          self,
          vllm_config: VllmConfig,
-@@ -454,7 +485,7 @@
+@@ -457,7 +488,7 @@
              )
  
              INDEX_SCORES_WARMUP.register_warmup(
@@ -358,7 +352,7 @@ diff -ruN a/vllm/models/deepseek_v41/nvidia/sm80_attention.py b/vllm/models/deep
                  self.sm80_cfg.index_n_heads,
                  self.sm80_cfg.index_head_dim,
                  self.sm80_cfg.index_heads_per_rank,
-@@ -604,8 +635,10 @@
+@@ -586,8 +617,10 @@
                  index_weights.dtype != torch.bfloat16 or index_weights.stride(1) != 1):
              reason = "index weights must have contiguous heads"
          for cache in (caches.swa, caches.comp, caches.idxk):
@@ -371,7 +365,7 @@ diff -ruN a/vllm/models/deepseek_v41/nvidia/sm80_attention.py b/vllm/models/deep
          if caches.ring is not None and (caches.ring.dtype != torch.float32 or
                                         caches.ring.stride(2) != 1):
              reason = "ring rows must be contiguous FP32"
-@@ -639,7 +672,7 @@
+@@ -621,7 +654,7 @@
              swa=self.swa_cache_layer.kv_cache,
              topk=self.topk_indices_buffer,
              comp=self._compressed_kv_cache() if self.compress_ratio else None,
@@ -380,7 +374,7 @@ diff -ruN a/vllm/models/deepseek_v41/nvidia/sm80_attention.py b/vllm/models/deep
              ring=(
                  self.compressor.state_cache.kv_cache
                  if self.compressor is not None
-@@ -649,6 +682,14 @@
+@@ -631,6 +664,14 @@
              candidates=self.candidate_block_buffer,
          )
  
@@ -395,7 +389,7 @@ diff -ruN a/vllm/models/deepseek_v41/nvidia/sm80_attention.py b/vllm/models/deep
      def _sm80_batch(self, attn_metadata: dict[str, Any], positions: torch.Tensor):
          """Gather this step's token metadata from the upstream builders."""
          swa = cast(Any, attn_metadata[self.swa_cache_layer.prefix])
-@@ -689,7 +730,11 @@
+@@ -671,7 +712,11 @@
              if self.is_kv_source:
                  batch.comp_slots = comp.slot_mapping[:T]
          if self.indexer is not None:

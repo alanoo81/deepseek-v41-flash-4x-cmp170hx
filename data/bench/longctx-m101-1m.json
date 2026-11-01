@@ -1,0 +1,134 @@
+[
+ {
+  "size": 131072,
+  "prompt_tokens": 131238,
+  "ttft": 41.5,
+  "decode_tps": 58.7,
+  "hits": 8,
+  "needles": 8,
+  "per_depth": [
+   [
+    0.05,
+    true
+   ],
+   [
+    0.179,
+    true
+   ],
+   [
+    0.307,
+    true
+   ],
+   [
+    0.436,
+    true
+   ],
+   [
+    0.564,
+    true
+   ],
+   [
+    0.693,
+    true
+   ],
+   [
+    0.821,
+    true
+   ],
+   [
+    0.95,
+    true
+   ]
+  ],
+  "answer": "coffre 1 : MLJ-0042-C3Z\ncoffre 2 : MVI-5681-5B8\ncoffre 3 : GRY-7272-T9Y\ncoffre 4 : HIU-5323-1ZE\ncoffre 5 : UAR-1638-AQO\ncoffre 6 : LWT-1424-5HY\ncoffre 7 : WKE-4323-MPF\ncoffre 8 : NGA-0249-6ZN",
+  "error": null
+ },
+ {
+  "size": 524288,
+  "prompt_tokens": 522280,
+  "ttft": 257.5,
+  "decode_tps": 55.7,
+  "hits": 8,
+  "needles": 8,
+  "per_depth": [
+   [
+    0.05,
+    true
+   ],
+   [
+    0.179,
+    true
+   ],
+   [
+    0.307,
+    true
+   ],
+   [
+    0.436,
+    true
+   ],
+   [
+    0.564,
+    true
+   ],
+   [
+    0.693,
+    true
+   ],
+   [
+    0.821,
+    true
+   ],
+   [
+    0.95,
+    true
+   ]
+  ],
+  "answer": "coffre 1 : DKQ-9857-WE9\ncoffre 2 : SXD-2319-BSO\ncoffre 3 : KXO-8150-P5Z\ncoffre 4 : PUK-5088-L19\ncoffre 5 : LXQ-7950-5E1\ncoffre 6 : CFE-9272-K7V\ncoffre 7 : ITE-1917-SL1\ncoffre 8 : TVN-7503-BDD",
+  "error": null
+ },
+ {
+  "size": 1000000,
+  "prompt_tokens": 996972,
+  "ttft": 702.7,
+  "decode_tps": 51.5,
+  "hits": 8,
+  "needles": 8,
+  "per_depth": [
+   [
+    0.05,
+    true
+   ],
+   [
+    0.179,
+    true
+   ],
+   [
+    0.307,
+    true
+   ],
+   [
+    0.436,
+    true
+   ],
+   [
+    0.564,
+    true
+   ],
+   [
+    0.693,
+    true
+   ],
+   [
+    0.821,
+    true
+   ],
+   [
+    0.95,
+    true
+   ]
+  ],
+  "answer": "coffre 1 : MKB-9991-MWH\ncoffre 2 : WPS-1363-B9W\ncoffre 3 : BGO-6986-G6T\ncoffre 4 : OOU-2899-Q25\ncoffre 5 : VHT-3098-AT8\ncoffre 6 : ECS-4202-2AQ\ncoffre 7 : DMV-5304-NO3\ncoffre 8 : KWP-0811-TLH",
+  "error": null
+ }
+]

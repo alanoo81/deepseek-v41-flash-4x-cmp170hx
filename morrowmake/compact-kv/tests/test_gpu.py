@@ -1,10 +1,10 @@
 """GPU check of the packed caches: every kernel that reads or writes them gives the
 same bits as with the BF16 caches holding the reference's rounded values."""
 import torch
-from vllm.models.deepseek_v41.nvidia.ops import sm80_kv_pack as kp
-from vllm.models.deepseek_v41.nvidia.ops.sm80_act_quant import qdq_fp4, qdq_fp8
-from vllm.models.deepseek_v41.nvidia.ops import sm80_sparse_attn, sm80_attn_fused, sm80_index_scores
-from vllm.models.deepseek_v41.nvidia.ops import sm80_attn_core as core
+from vllm_sm80.models.deepseek_v41.ops import sm80_kv_pack as kp
+from vllm_sm80.models.deepseek_v41.ops.sm80_act_quant import qdq_fp4, qdq_fp8
+from vllm_sm80.models.deepseek_v41.ops import sm80_sparse_attn, sm80_attn_fused, sm80_index_scores
+from vllm_sm80.models.deepseek_v41.ops import sm80_attn_core as core
 from vllm.triton_utils import tl, triton
 
 dev = "cuda"

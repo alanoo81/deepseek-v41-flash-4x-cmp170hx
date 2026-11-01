@@ -1,10 +1,11 @@
 # Comparison with the Morrowmake recipe
 
-Since 2026-10-31 we serve [Morrowmake/dsv41-flash-cmp170hx-recipe](https://github.com/Morrowmake/dsv41-flash-cmp170hx-recipe)
-release 1.0.0 (`7f9023cd`, engine [Morrowmake/vllm-cmp170hx](https://github.com/Morrowmake/vllm-cmp170hx) at
-`a0c57b52`), with two changes of ours: the routed experts of layers 18-22 grafted from 2 to 3 bits, and a lossless
-compact KV cache. This page compares **Morrowmake as released** with **our configuration built on it**, on the same
-machine and with the same tools (sections 1-5).
+We serve [Morrowmake/dsv41-flash-cmp170hx-recipe](https://github.com/Morrowmake/dsv41-flash-cmp170hx-recipe)
+release 1.0.1 (tag `v1.0.1`, engine [Morrowmake/vllm-cmp170hx](https://github.com/Morrowmake/vllm-cmp170hx): vLLM
+`330c5bff`, queue `e05403fd`, plugin `vllm_sm80` `0b34823c`), with two changes of ours: the routed experts of layers
+18-22 grafted from 2 to 3 bits, and a lossless compact KV cache. This page compares **Morrowmake 1.0.1 as released**
+with **our configuration built on it**, on the same machine and with the same tools (sections 1-5). We moved from 1.0.0
+to 1.0.1 on 2026-11-01; what that changed is in [results.md, 2.5](results.md#25-from-morrowmake-100-to-101).
 
 Before that we served the [GNmac-lab recipe](https://github.com/GNmac-lab/deepseek-v41-flash-1017-cmp170hx) 1.2.0
 with the same graft. Section 6 sums up how the two engines compared and why we switched; the full record of that
@@ -13,9 +14,9 @@ comparison (2026-10-27 to 2026-10-30), in which "ours" meant GNmac 1.2.0 with th
 
 ## 1. What our configuration changes
 
-| | Morrowmake 1.0.0 as released | Our configuration |
+| | Morrowmake 1.0.1 as released | Our configuration |
 |---|---|---|
-| Engine | image `ghcr.io/morrowmake/vllm-cmp170hx@sha256:f67d9be4…` | **the same image**, with seven engine files mounted over it for the compact cache ([compact-kv-cache.md](compact-kv-cache.md)) |
+| Engine | image `ghcr.io/morrowmake/vllm-cmp170hx@sha256:32ae8b0e…` | **the same image**, with seven engine files mounted over it for the compact cache ([compact-kv-cache.md](compact-kv-cache.md)) |
 | Routed experts | LibertAI EXL3 2.9 bpw @ `c178a012`: layers 18-22 at **2 bits**, the others at 3 bits | layers 18-22 at **3 bits**, from LibertAI's 3.5 bpw pack @ `04a492fc` (same tensor names); all 40 layers at 3 bits |
 | Compressed latent and indexer keys | BF16 rows holding the reference's rounded values (1,024 + 256 bytes per position) | packed rows holding **the same values bit for bit**, both in one 512-byte row |
 | Everything else | DSpark (7 drafts, adaptive), memory setting 0.95, 262,144 tokens, 8 sequences, Engram tables placed automatically, P2P content check | unchanged; we only set the listen address, port, served name and API key |
@@ -25,46 +26,49 @@ comparison (2026-10-27 to 2026-10-30), in which "ours" meant GNmac 1.2.0 with th
 ## 2. Quality
 
 Paired perplexity on the same frozen windows ([results.md, 2.1](results.md#21-method)), Morrowmake as released
-(`morrowmake-B`, run on 2026-10-30) against ours (`mm-kvc15`). Both without DSpark, which does not change the scored
+(`m101-release`) against ours (`m101-kvc`). Both without DSpark, which does not change the scored
 log-probabilities ([results.md, 2.4](results.md#24-dspark)). Negative means ours predicts the text better:
 
 | Set | All | French | English | Code | Windows where ours is better |
 |---|---|---|---|---|---|
-| 1,024-token windows | **-1.81 %** [-2.01, -1.61] | **-4.45 %** [-4.97, -3.94] | -0.69 % [-0.96, -0.44] | -0.24 % [-0.37, -0.10] | 151 of 192 |
-| 40-token windows | -0.49 % [-0.84, -0.13] | -0.63 % [-1.34, +0.11] | -1.06 % [-1.66, -0.45] | +0.21 % [-0.26, +0.68] | 641 of 1,200 |
-| 32k "prose" (8 French, 8 English, 3 code) | **-2.31 %** [-2.75, -1.79] | **-4.79 %** [-5.75, -3.61] | -0.60 % [-0.91, -0.31] | -0.14 % [-0.23, +0.01] | 18 of 19 |
-| 32k code | -0.06 % [-0.12, -0.00] | | | | 11 of 16 |
+| 1,024-token windows | **-1.76 %** [-1.97, -1.55] | **-4.39 %** [-4.94, -3.83] | -0.68 % [-0.94, -0.45] | -0.16 % [-0.31, -0.02] | 150 of 192 |
+| 40-token windows | -0.23 % [-0.57, +0.12] | -0.02 % [-0.72, +0.68] | -0.99 % [-1.57, -0.40] | +0.33 % [-0.16, +0.83] | 596 of 1,200 |
+| 32k "prose" (8 French, 8 English, 3 code) | **-2.28 %** [-2.70, -1.75] | **-4.72 %** [-5.66, -3.54] | -0.62 % [-0.88, -0.35] | -0.04 % [-0.13, +0.07] | 18 of 19 |
+| 32k code | -0.06 % [-0.11, -0.02] | | | | 11 of 16 |
 
-- **German and Italian** (added afterwards, same method, 64 windows of 1,024 tokens from 8 books each): German
-  **-3.03 %** [-3.71, -2.37], 56 of 64 windows and every book better; Italian -0.77 % [-1.36, -0.22], 30 of 64. The
-  Italian gain comes from its two best-known books (*I promessi sposi* -4.4 %, *Pinocchio* -3.9 %); the six
-  lesser-known novels move by -0.1 to +0.55 %. *Inference:* part of what the graft restores may be recall of text
-  seen in training. Data: `data/nll/lang/{morrowmake,mm-kvc15}.json.gz`.
+- **German and Italian** (same method, 64 windows of 1,024 tokens from 8 books each): German **-3.06 %** [-3.78, -2.35],
+  54 of 64 windows and every book better; Italian -0.98 % [-1.63, -0.38], 29 of 64. The Italian gain comes from its
+  two best-known books (*I promessi sposi* -5.2 %, *Pinocchio* -4.5 %); the six lesser-known novels move by -0.2 to
+  +0.63 %. *Inference:* part of what the graft restores may be recall of text seen in training. Data:
+  `data/nll/lang/{m101-release,m101-kvc}.json.gz`.
 - **All of it is the graft.** The compact cache gives the same log-probabilities as Morrowmake's BF16 rows on every
-  token ([results.md, 2.3](results.md#23-the-compact-kv-cache-is-bit-identical)); the same graft gives the same gain
-  in GNmac's engine (-1.80 %, -4.45 % on French).
+  token ([results.md, 2.3](results.md#23-the-compact-kv-cache-is-bit-identical)); the same graft gives about the same
+  gain in GNmac's engine (-1.80 %, -4.45 % on French).
 - **The 2-bit layers cost most on French text and least on code.** On 32k-token code windows the graft gains only
-  0.06 %; on French it gains 4.5-4.8 % at every length. Benchmarks in English or code alone would hide most of it.
-- **Self-check** (greedy continuations rescored by teacher forcing; internal consistency only, not closeness to the
-  original): mean |decode - prefill| log-probability 0.048 as released, 0.043 ours; the prefill argmax differs from
-  the generated token on 3.9 % and 3.0 % of positions.
+  0.06 %; on French it gains 4.4-4.7 % from 1,024 tokens up. Benchmarks in English or code alone would hide most of it.
+- **On 40-token windows the gain is within noise** on 1.0.1. It was -0.49 % [-0.84, -0.13] on 1.0.0;
+  [results.md, 2.5](results.md#25-from-morrowmake-100-to-101) has what we tested and what remains unknown.
+- **Self-check, measured on 1.0.0** (greedy continuations rescored by teacher forcing; internal consistency only, not
+  closeness to the original): mean |decode - prefill| log-probability 0.048 as released, 0.043 ours; the prefill argmax
+  differs from the generated token on 3.9 % and 3.0 % of positions. Ours on 1.0.1: 0.043 and 2.7 %; we did not run it on
+  the release.
 - **Not re-run on ours:** HumanEval and GSM8K. On 2026-10-30 they could not separate stacks that differed by 2 % of
   perplexity ([appendix, 0.4](#a04-humaneval-and-gsm8k)).
 
-Data: `data/nll/morrowmake-B*.json`, `long/morrowmake-B.json.gz`, `codex/morrowmake.json.gz` against
-`mm-kvc15*.json.gz`; self-checks `sc-morrowmake-B.json`, `sc-mm-kvc15.json.gz`.
+Data: `data/nll/m101-release*.json.gz`, `long/m101-release.json.gz`, `codex/m101-release.json.gz` against
+`m101-kvc*.json.gz` in the same directories; self-check `sc-m101-kvc.json.gz`.
 
 ## 3. Memory and context
 
-| | Morrowmake 1.0.0 as released | Ours |
+| | Morrowmake 1.0.1 as released | Ours |
 |---|---:|---:|
-| KV memory per card, no DSpark | 7.76 GiB | 5.78 GiB (the graft takes 1.98 GiB) |
-| KV pool, 262,144-token context, **DSpark** | 1,247,657 (Morrowmake publishes 1,247,406 on its machine) | **1,360,109** (+9 %) |
-| KV pool, 262,144-token context, no DSpark | 2,154,551 | **3,189,000** (+48 %) |
-| Context of 1,048,576 tokens | not validated by Morrowmake | 4,211,001-token pool; exact recall 8 of 8 at 997k tokens ([results.md, 5](results.md#5-contexts-beyond-262144-tokens)) |
+| KV memory per card, no DSpark | 7.58 GiB | 5.60 GiB (the graft takes 1.98 GiB) |
+| KV pool, 262,144-token context, **DSpark** | 1,296,145 (Morrowmake publishes 1,295,894 on its machine) | **1,466,159** (+13 %) |
+| KV pool, 262,144-token context, no DSpark | 2,105,722 | **3,090,900** (+47 %) |
+| Context of 1,048,576 tokens | not validated by Morrowmake | 4,063,104-token pool; exact recall 8 of 8 at 997k tokens ([results.md, 5](results.md#5-contexts-beyond-262144-tokens)) |
 
-The graft costs 1.98 GiB per card, which would shrink Morrowmake's pool by about a quarter (2.15 M → 1.60 M
-tokens with BF16 rows). The compact cache more than pays it back: +9 % with DSpark, +48 % without.
+The graft costs 1.98 GiB per card, which would shrink Morrowmake's pool by about a quarter (2.11 M → 1.56 M
+tokens with BF16 rows). The compact cache more than pays it back: +13 % with DSpark, +47 % without.
 
 ## 4. Speed
 
@@ -72,47 +76,52 @@ Same machine, 200 W per card, the MiaAI-Lab protocol (GNmac's `bench/mia.py`: te
 400-token cap; one user = median streaming rate after the first token; 2-8 users = completion tokens / batch wall
 time). DSpark on for both. tok/s, structured / code / prose:
 
-| | Morrowmake 1.0.0 as released | Ours | Ours against it |
+| | Morrowmake 1.0.1 as released | Ours | Ours against it |
 |---|---|---|---|
-| 1 user | 276 / 217 / 151 | 267 / 212 / 153 | -3 % / (code: see below) / +1 % |
-| 2 users | 360 / 215 / 193 | 349 / 169 / 217 | -3 % / / +13 % |
-| 4 users | 501 / 285 / 312 | 485 / 306 / 295 | -3 % / / -6 % |
-| 8 users | 585 / 355 / 353 | 570 / 291 / 349 | -2.5 % / / -1 % |
+| 1 user | 297 / 235 / 158 | 288 / 251 / 155 | -3 % / (code: see below) / -2 % |
+| 2 users | 375 / 147 / 212 | 367 / 167 / 195 | -2 % / / -8 % |
+| 4 users | 521 / 238 / 300 | 511 / 249 / 301 | -2 % / / +0 % |
+| 8 users | 624 / 378 / 377 | 639 / 307 / 362 | +2 % / / -4 % |
 
-- **The code column does not compare.** Morrowmake as released answers the code prompt in 95 tokens, ours in 48
-  (a different greedy answer). Shorter answers carry more fixed cost per token.
-- On the other two prompts we are 1-3 % slower, apart from the noisier 2- and 4-user prose points. That is what
-  the compact cache costs in decode ([compact-kv-cache.md, 6](compact-kv-cache.md#6-speed-one-stream-no-dspark)).
-- DSpark accepts about the same share of drafts on both (structured 86-87 %, prose 43-46 % at one user).
+- **The code column does not compare in batches.** Alone, both answer the code prompt in 48 tokens; at 4 and 8 users
+  the greedy answers differ (239 and 192 tokens in all at 4 users, 760 and 478 at 8). Shorter answers carry more fixed
+  cost per token.
+- On the other two prompts we are between -4 % and +2 %, apart from the noisier 2-user prose point. Each figure comes
+  from one boot.
+- DSpark accepts about the same share of drafts on both (structured 86 %, prose 40 % at one user).
+- **Morrowmake's published figures are higher than these.** It publishes 297 / 297 / 170 at one user and 868 / 795 /
+  464 at 8 users on its machine (180 W per card). The first column here is the same release on ours (200 W). The gap
+  was there at 1.0.0: published 760 structured at 8 users, measured here 585. We do not know how much comes from the
+  machine and how much from the method.
 
 Prompt reading, [`tests/speed.py`](../tests/speed.py), one stream, prefill tok/s:
 
-| Prompt | Morrowmake as released (DSpark) | Morrowmake + graft, BF16 rows (no DSpark) | **Ours** (no DSpark) |
+| Prompt | Morrowmake 1.0.1 as released (DSpark) | **Ours** (no DSpark) | **Ours** (DSpark) |
 |---|---:|---:|---:|
-| 3.5k tokens | 3,765 | 3,815 | 3,594 |
-| 33k | 4,051 | 4,104 | 3,834 |
-| 66k | 3,892 | 3,939 | 3,654 |
-| 132k | 3,567 | 3,600 | 3,304 |
-| 259k | 3,053 | 3,081 | 2,776 |
-| Time to first token at 259k | 85 s | 84 s | 93 s |
+| 3.5k tokens | 3,683 | 3,587 | 3,527 |
+| 33k | 3,935 | 3,818 | 3,755 |
+| 66k | 3,758 | 3,632 | 3,579 |
+| 132k | 3,431 | 3,284 | 3,243 |
+| 259k | 2,958 | 2,787 | 2,744 |
+| Time to first token at 259k | 88 s | 93 s | 95 s |
 
-- DSpark does not change prompt reading: compact v1 read at 3,437 and 3,439 tok/s at 3.5k, and at 1,985 and 1,993
-  at 259k, with and without it (`data/bench/speed/speed-mm-kvc-dspark.json`, `speed-mm-kvc.json`).
-- **The graft costs nothing here** (second column against the first); **the compact cache costs 5-9 %**, more at
-  long prompts (third column against the second).
+- **We read prompts 3-6 % slower** without DSpark, more at long prompts. *Inference:* the cost of the compact cache: on
+  1.0.0, the release and the grafted release with BF16 rows read at the same speed, so the graft costs nothing here.
+- Cold prefill on real text, median of 9: 3,724 tok/s as released, 3,621 ours.
 
-Data: `data/bench/mia-json-2026-10-31/mm-release-dspark-*.json`, `mm-kvc15-dspark-*.json`;
-`data/bench/speed/speed-mm-release-dspark.json`, `speed-mm-k3.json`, `speed-mm-kvc15.json`.
+Data: `data/bench/mia-json-2026-11-01/m101-release-dspark-*.json`, `m101-kvc-dspark-*.json`;
+`data/bench/speed/speed-m101-release-dspark.json`, `speed-m101-kvc-nospec.json`, `speed-m101-kvc-dspark.json`.
 
 ## 5. Costs of our configuration
 
-- **Decode is 2-5 % slower and prefill 6-10 % slower** than with BF16 rows (the compact cache), see
+- **Decode is 2-5 % slower and prefill 6-10 % slower** than with BF16 rows (the compact cache, measured on 1.0.0), see
   [compact-kv-cache.md](compact-kv-cache.md#6-speed-one-stream-no-dspark).
 - **The graft's experts are 3-bit where Morrowmake's are 2-bit** on five layers. It costs 1.98 GiB per card, and
   nothing measurable in prompt reading (section 4).
 - **More to install and to keep in step:** 24 GiB more to download, a changed hybrid hash, seven engine files
-  mounted over the image. A new Morrowmake release means rebuilding the overlay against it (`build-overlay.sh`
-  stops if the patch does not apply) and re-running the GPU unit test.
+  mounted over the image. A new Morrowmake release means porting the overlay to it (`build-overlay.sh`
+  stops if the patch does not apply) and re-running the GPU unit test. The move to 1.0.1 took a change of import
+  paths.
 - **No independent review** of the compact cache yet: our evidence is the GPU unit test and the bit-identical
   scoring of 1.39 M tokens.
 
@@ -123,20 +132,21 @@ time. On 2026-10-30 we ran both on this machine with the same weights (the publi
 
 | GNmac → Morrowmake, same weights | 1,024-token windows | 32k prose | 
 |---|---|---|
-| Perplexity change | +0.15 % [+0.02, +0.29] | **-0.57 % [-0.73, -0.42]**, and -2.0 % on its three code windows |
+| Perplexity change on 1.0.0 | +0.15 % [+0.02, +0.29] | **-0.57 % [-0.73, -0.42]**, and -2.0 % on its three code windows |
+| Perplexity change on 1.0.1 | +0.14 % [+0.02, +0.25] | **-0.57 % [-0.73, -0.42]**, and -2.0 % on its three code windows |
 
 On short windows the two engines are within noise of each other (GNmac slightly ahead); from 32k tokens
 Morrowmake's is better. *Inference:* Morrowmake reproduces the reference's FP4 rounding of the compressed cache and
 of the indexer keys (appendix, [1.1](#a11-where-morrowmake-is-likely-closer-to-the-original-kv-and-indexer-rounding)),
-where GNmac stores FP8 records on sm_80. With our grafted weights on both engines, Morrowmake's (with the compact
-cache) does +0.14 % on 1,024-token windows, **-0.58 %** on 32k prose and **-1.64 %** on 32k code. GNmac's engine is
-faster (about 1.45x at one stream without DSpark): [results.md, 4](results.md#4-speed).
+where GNmac stores FP8 records on sm_80. With our grafted weights on both engines, Morrowmake's 1.0.1 (with the compact
+cache) does +0.17 % on 1,024-token windows, **-0.54 %** on 32k prose and **-1.62 %** on 32k code. GNmac's engine is
+faster (about 1.33x at one stream without DSpark): [results.md, 4](results.md#4-speed).
 
 ## Appendix: the 2026-10-30 record (GNmac's engine against Morrowmake's)
 
 This is the comparison as written on 2026-10-30, before we switched. In it, **"ours" means our configuration of the
-time: GNmac 1.2.0 with the graft, `fp8_ds_mla`, no DSpark, memory setting 0.98**, and "Morrowmake" means its release
-as shipped. Several of its open questions were answered later; the places are marked **[Since measured]**.
+time: GNmac 1.2.0 with the graft, `fp8_ds_mla`, no DSpark, memory setting 0.98**, and "Morrowmake" means its 1.0.0
+release as shipped. Several of its open questions were answered later; the places are marked **[Since measured]**.
 
 ## A0. Same-machine measurement (2026-10-30)
 
