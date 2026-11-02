@@ -1,5 +1,5 @@
 #!/bin/bash
-# The configuration of this repository WITHOUT DSpark: about 2.3x the KV pool, single-stream decode ~72 tok/s.
+# The configuration of this repository WITHOUT DSpark: about 2.1x the KV pool, single-stream decode ~79 tok/s.
 # Pass more vLLM arguments through MORE_ARGS, e.g. MORE_ARGS="--max-model-len 1048576".
 set -euo pipefail
 cd "$(dirname "$0")"

@@ -1,22 +1,22 @@
 --- a/start.sh
 +++ b/start.sh
-@@ -533,6 +533,15 @@
+@@ -618,6 +618,15 @@
  container_args() {
      local envfile="$1" mounts=()
      mapfile -t mounts < <(model_mounts ro)
 +    # Lossless compact KV cache: when kvc-overlay/ holds the engine files of compact-kv/, they are mounted
 +    # over the image's, read-only. They change nothing unless VLLM_SM80_COMPACT_KV=1.
-+    local kvc="$SCRIPT_DIR/kvc-overlay/vllm/models/deepseek_v41/nvidia" kvc_mounts=() f
++    local kvc="$SCRIPT_DIR/kvc-overlay/vllm_sm80/models/deepseek_v41" kvc_mounts=() f
 +    if [ -d "$kvc" ]; then
 +        for f in ops/sm80_kv_pack.py ops/sm80_attn_core.py ops/sm80_attn_pipeline.py ops/sm80_sparse_attn.py \
 +                 ops/sm80_attn_fused.py ops/sm80_index_scores.py sm80_attention.py; do
-+            kvc_mounts+=(-v "$kvc/$f:/opt/vllm-src/vllm/models/deepseek_v41/nvidia/$f:ro")
++            kvc_mounts+=(-v "$kvc/$f:/opt/assembly/plugin/vllm_sm80/models/deepseek_v41/$f:ro")
 +        done
 +    fi
      CRUN=(docker run -d --name "$CONTAINER_NAME" --label "$LABEL=$SCRIPT_DIR"
          --user "$(id -u):$(id -g)" --workdir /cache
          --gpus all --shm-size "$SHM_SIZE" --memory "$MEM_LIMIT" --memory-swap "$MEM_LIMIT"
-@@ -544,7 +553,7 @@
+@@ -629,7 +638,7 @@
          -v "$SCRIPT_DIR/p2p_check.sh:/recipe/p2p_check.sh:ro"
          -v "$SCRIPT_DIR/p2p_probe.cu:/recipe/p2p_probe.cu:ro"
          -v "$SCRIPT_DIR/engram_placement.sh:/recipe/engram_placement.sh:ro"

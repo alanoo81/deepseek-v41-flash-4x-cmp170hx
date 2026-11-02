@@ -1,0 +1,51 @@
+# Server-start and benchmark lines quoted in docs/results.md (2026-11-01, Morrowmake 1.0.1), extracted from the engine
+# logs and our orchestration logs. Times are UTC in engine lines.
+
+## graft + BF16, graft + compact (no DSpark, DSpark)
+### 1.0.1 + graft, unmodified engine, BF16, no DSpark (2026-11-01 19:37:58)
+dsv41 · healthy after 930s
+[boot-check] PASS: OK; speculative decoding off, draft counters not checked
+INFO 11-01 18:51:13 [gpu_worker.py:775] Available KV cache memory: 5.6 GiB
+INFO 11-01 18:51:13 [kv_cache_utils.py:1150] GPU KV cache size: 1,555,036 tokens, Maximum concurrency for 262,144 tokens per request: 5.93x
+### 1.0.1 + graft + compact cache, no DSpark (2026-11-01 20:11:02)
+dsv41 · healthy after 373s
+[boot-check] PASS: OK; speculative decoding off, draft counters not checked
+INFO 11-01 19:17:00 [gpu_worker.py:775] Available KV cache memory: 5.6 GiB
+INFO 11-01 19:17:00 [kv_cache_utils.py:1150] GPU KV cache size: 3,090,900 tokens, Maximum concurrency for 262,144 tokens per request: 11.79x
+m101-bf16.json vs m101-kvc.json: 196416 tokens, 0 different -> IDENTICAL
+m101-bf16-short.json vs m101-kvc-short.json: 46800 tokens, 0 different -> IDENTICAL
+long-m101-bf16.json vs long-m101-kvc.json: 622573 tokens, 0 different -> IDENTICAL
+long-codex-m101-bf16.json vs long-codex-m101-kvc.json: 524272 tokens, 0 different -> IDENTICAL
+sc-m101-bf16.json vs sc-m101-kvc.json: 768 generated tokens, 0 different -> IDENTICAL
+m101-kvc cold prefill median of 9: 3621 tok/s
+### 1.0.1 + graft + compact cache, DSpark (2026-11-01 20:52:16)
+dsv41 · healthy after 531s
+[boot-check] PASS: OK; drafts=125 proposed=735 accepted=646
+INFO 11-01 20:00:15 [gpu_worker.py:775] Available KV cache memory: 2.73 GiB
+INFO 11-01 20:00:15 [kv_cache_utils.py:1150] GPU KV cache size: 1,466,159 tokens, Maximum concurrency for 262,144 tokens per request: 5.59x
+sc-m101-kvc.json vs sc-m101-kvc-dspark.json: 768 values, 323 differ, max |d| 0.0441 -> DIFFERENT
+
+## 1.0.1 as released (no DSpark, DSpark), 1M profile, served
+### 1.0.1 as released, no DSpark (2026-11-01 22:23:03)
+dsv41 · healthy after 675s
+[boot-check] PASS: OK; speculative decoding off, draft counters not checked
+INFO 11-01 21:31:57 [gpu_worker.py:775] Available KV cache memory: 7.58 GiB
+INFO 11-01 21:31:58 [kv_cache_utils.py:1150] GPU KV cache size: 2,105,722 tokens, Maximum concurrency for 262,144 tokens per request: 8.03x
+### 1.0.1 as released, DSpark (2026-11-01 22:54:51)
+dsv41 · healthy after 476s
+[boot-check] PASS: OK; drafts=164 proposed=908 accepted=603
+INFO 11-01 22:01:52 [gpu_worker.py:775] Available KV cache memory: 4.73 GiB
+INFO 11-01 22:01:52 [kv_cache_utils.py:1150] GPU KV cache size: 1,296,145 tokens, Maximum concurrency for 262,144 tokens per request: 4.94x
+m101-release cold prefill median of 9: 3724 tok/s
+### (switch of directories) (2026-11-01 23:15:07)
+### 1M profile on 1.0.1, compact cache (2026-11-01 23:15:08)
+dsv41 · healthy after 374s
+[boot-check] PASS: OK; speculative decoding off, draft counters not checked
+INFO 11-01 22:21:11 [gpu_worker.py:775] Available KV cache memory: 5.48 GiB
+INFO 11-01 22:21:11 [kv_cache_utils.py:1150] GPU KV cache size: 4,063,104 tokens, Maximum concurrency for 1,048,576 tokens per request: 3.87x
+  131072 tokens (prompt 131238): recall 8/8, TTFT 41.5 s, decode 58.7 tok/s
+  524288 tokens (prompt 522280): recall 8/8, TTFT 257.5 s, decode 55.7 tok/s
+ 1000000 tokens (prompt 996972): recall 8/8, TTFT 702.7 s, decode 51.5 tok/s
+### served configuration (2026-11-01 23:42:57)
+INFO 11-01 22:49:29 [gpu_worker.py:775] Available KV cache memory: 2.73 GiB
+INFO 11-01 22:49:29 [kv_cache_utils.py:1150] GPU KV cache size: 1,466,159 tokens, Maximum concurrency for 262,144 tokens per request: 5.59x

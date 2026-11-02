@@ -422,7 +422,7 @@ number. These were the ones that mattered here.
 
 ## 11. Lessons from the second round (2026-10-31)
 
-The second round (Morrowmake's engine, the compact KV cache) was run the same way. Four things are worth
+The second round (Morrowmake's engine, the compact KV cache) was run the same way. Five things are worth
 keeping.
 
 - **A unit test at served shapes caught what the end-to-end test might have missed.** The first compact-cache
@@ -443,6 +443,11 @@ keeping.
 - **"More faithful" settings were measured, not assumed.** Turning off the release's numerical shortcuts
   (BF16 all-reduce of `wo_b`, the MoE v2 kernels, one rounding per MoE all-reduce) sounded like a fidelity gain. It changed perplexity by
   +0.04 % [-0.05, +0.13] and made decoding 2.3x slower, so the shortcuts stayed.
+- **A new upstream release was validated like a change of ours.** Morrowmake 1.0.1 announced better speed. Re-running
+  the whole protocol showed the speed and also a small loss on 40-token windows (+0.44 % [+0.18, +0.70]) on our recipe
+  that a benchmark alone would not have shown. Cutting the two obvious suspects did not explain it, and we report it as
+  unexplained. The agent's first attempt at that test failed because its script did not stop the production server
+  first: the cards were full and no server started. It reported the failure and reran it.
 
 ## Credits
 

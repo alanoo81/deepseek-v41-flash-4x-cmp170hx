@@ -30,7 +30,7 @@ import os
 
 import torch
 
-from vllm.models.deepseek_v41.nvidia.ops.sm80_act_quant import (
+from vllm_sm80.models.deepseek_v41.ops.sm80_act_quant import (
     FP4_MAX,
     _pow2_ceil_tl,
     fp4_scale,

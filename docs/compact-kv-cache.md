@@ -5,15 +5,17 @@ The values in those rows have already been rounded by the model's reference code
 scale per small block, so most of each BF16 row is redundant. This change stores the 4-bit codes and the
 scale bytes instead and decodes them back to the **same bits** when a kernel reads them.
 
-| | BF16 (Morrowmake 1.0.0) | Compact v1 | **Compact v1.5 (served)** |
-|---|---:|---:|---:|
-| Compressed latent row | 1,024 B | 512 B | **512 B, shared** |
-| Index-key row | 256 B | 128 B | **inside the latent row** |
-| KV pool, no DSpark, 262,144-token context | 1,604,950 tokens | 2,738,502 | **3,189,000 (x1.99)** |
-| KV pool with DSpark | (not measured) | 1,166,235 | **1,360,109** |
-| Prompt log-probabilities vs BF16, 1.39 M tokens | reference | bit-identical | **bit-identical** |
-| Single-stream decode vs BF16 | reference | -5 to -9 % | **-2 to -5 %** |
-| Prefill vs BF16 | reference | -10 to -35 % | **-6 to -10 %** |
+| | BF16 (Morrowmake 1.0.1) | **Compact v1.5 (served)** |
+|---|---:|---:|
+| Compressed latent row | 1,024 B | **512 B, shared** |
+| Index-key row | 256 B | **inside the latent row** |
+| KV pool, no DSpark, 262,144-token context | 1,555,036 tokens | **3,090,900 (x1.99)** |
+| KV pool with DSpark | (not measured) | **1,466,159** |
+| Prompt log-probabilities vs BF16, 1.39 M tokens | reference | **bit-identical** |
+| Single-stream decode vs BF16, measured on 1.0.0 | reference | **-2 to -5 %** |
+| Prefill vs BF16, measured on 1.0.0 | reference | **-6 to -10 %** |
+
+Same weights on both sides. The first version, compact v1, is described in section 7.
 
 The patch is [`morrowmake/compact-kv/`](../morrowmake/compact-kv/). It changes nothing unless the
 environment sets `VLLM_SM80_COMPACT_KV=1`.
@@ -118,6 +120,8 @@ back with the BF16 path's masked load. It was exact too, but slower.
 
 ## 4. Kernel optimisation (v1 to v2)
 
+Measured on 1.0.0. The patch changes the same kernels on 1.0.1; we did not repeat these timings.
+
 The first decoder read every code byte twice (once per nibble) and every scale byte 16 times, one element at a
 time. v2 loads each code byte and each scale byte once with contiguous vector loads, splits the nibbles,
 interleaves them back with `tl.join` and multiplies each block by its broadcast scale.
@@ -141,6 +145,8 @@ not done it.
 
 ## 5. Validation
 
+Everything below was run on 1.0.0 and again on 1.0.1; the two give the same result.
+
 **GPU unit test** ([`compact-kv/tests/test_gpu.py`](../morrowmake/compact-kv/tests/test_gpu.py), run in the
 engine image with the patched files mounted). Every line must print `IDENTICAL`:
 
@@ -151,7 +157,7 @@ engine image with the patched files mounted). Every line must print `IDENTICAL`:
 - `sm80_sparse_attn`, `sm80_attn_fused` (pre- and post-RoPE, with the `final_out` epilogue), `sm80_index_scores`
   and the torch fallbacks: packed result equals BF16 result.
 
-**Served model.** Morrowmake with layers 18-22 grafted, BF16 cache against compact cache, same frozen windows
+**Served model.** Morrowmake 1.0.1 with layers 18-22 grafted, BF16 cache against compact cache, same frozen windows
 ([`tests/nll_eval.py`](../tests/nll_eval.py), checked with [`tests/identical.py`](../tests/identical.py)):
 
 | Set | Tokens | Result |
@@ -162,11 +168,15 @@ engine image with the patched files mounted). Every line must print `IDENTICAL`:
 | 16 windows of 32k tokens of code | 524,272 | identical |
 | Self-check: 768 generated tokens | 768 | identical decode log-probabilities |
 
-Data: `data/nll/{,long/,codex/}mm-k3*.json.gz` against `mm-kvc15*.json.gz`, `data/nll/sc-mm-k3.json.gz` against
-`sc-mm-kvc15.json.gz`. v1 gave the same identities (`mm-kvc.json.gz`, `codex/mm-kvc.json.gz`, `sc-mm-kvc.json.gz`;
+Data: `data/nll/{,long/,codex/}m101-bf16*.json.gz` against `m101-kvc*.json.gz`, `data/nll/sc-m101-bf16.json.gz` against
+`sc-m101-kvc.json.gz`. On 1.0.0: `mm-k3*` against `mm-kvc15*`. v1 gave the same identities (`mm-kvc.json.gz`, `codex/mm-kvc.json.gz`, `sc-mm-kvc.json.gz`;
 the v2 runs are in our logs only).
 
 ## 6. Speed, one stream, no DSpark
+
+Measured on 1.0.0, the only release where we ran BF16 rows and compact rows through this bench. On 1.0.1, `m101-kvc`
+decodes at 73.8 / 72.8 / 72.7 / 71.9 / 69.9 tok/s and reads prompts at 3,587 / 3,818 / 3,632 / 3,284 / 2,787 tok/s
+over the same lengths (`speed-m101-kvc-nospec.json`), 3-6 % slower in prompt reading than the release itself.
 
 Our speed bench ([`tests/speed.py`](../tests/speed.py): unique prompts, warm-up discarded, natural output of at
 most 256 tokens), decode in tok/s / prefill in tok/s:
@@ -200,14 +210,17 @@ Data: `data/bench/speed/speed-mm-k3.json` (BF16), `speed-mm-kvc.json` (v1), `spe
    Decode loss 2-5 %, prefill 6-10 %, still bit-identical.
 5. **v1.5, one row per position.** The latent row had 224 free bytes and the index key needs 68. Putting the key
    there removed the index-key cache altogether: pool 2.74 M → 3.19 M tokens, same speed, still bit-identical.
+6. **The move to Morrowmake 1.0.1.** The engine files moved from the patched vLLM tree to the `vllm_sm80` plugin, with
+   the same content where the patch applies. Only the import paths of the patch changed. The GPU unit test and the
+   bit identity with BF16 on the four sets passed again, with the routed experts now split across the four cards.
 
 Every version went through the same two gates before anything else: the GPU unit test, then the token-by-token
 comparison of the served model's log-probabilities with the BF16 cache on the four frozen sets.
 
 ## 8. Limits
 
-- Morrowmake's sm_80 engine only, release 1.0.0 (engine `a0c57b52`). The patch touches seven files of
-  `vllm/models/deepseek_v41/nvidia/`.
+- Morrowmake's sm_80 engine only, release 1.0.1 (plugin `vllm_sm80` `0b34823c`). The patch touches seven files of
+  `vllm_sm80/models/deepseek_v41/`. For release 1.0.0, use this repository's history before the 1.0.1 move.
 - It saves memory on the compressed-attention caches only; weights and activations are unchanged.
-- Decode still costs 2-5 % and prefill 6-10 % against BF16 rows.
+- Decode still costs 2-5 % and prefill 6-10 % against BF16 rows (measured on 1.0.0).
 - The GPU unit test and the served-model identity are our evidence. No independent review yet.

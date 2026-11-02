@@ -1,7 +1,7 @@
-# Setup: the current configuration on Morrowmake 1.0.0
+# Setup: the current configuration on Morrowmake 1.0.1
 
 This page rebuilds what we serve: [Morrowmake's recipe](https://github.com/Morrowmake/dsv41-flash-cmp170hx-recipe)
-1.0.0, with the routed experts of layers 18-22 grafted to 3 bits and the lossless compact KV cache. Every step
+1.0.1, with the routed experts of layers 18-22 grafted to 3 bits and the lossless compact KV cache. Every step
 starts from Morrowmake's own pinned files, and each one is checked before the next. The previous
 configuration (GNmac engine) is in [setup-gnmac.md](setup-gnmac.md).
 
@@ -16,12 +16,12 @@ What we ran on: ASRock Rack ROMED8-2T, EPYC 7F52, 512 GB DDR4-3200 (8 channels),
 with a cmpunlocker fork and a P2P patch (Morrowmake's P2P check passes without its TRAP31 patch), 200 W per
 card, inside an LXC container.
 
-## 2. Morrowmake 1.0.0 as released
+## 2. Morrowmake 1.0.1 as released
 
 ```bash
 git clone https://github.com/Morrowmake/dsv41-flash-cmp170hx-recipe.git morrowmake
-cd morrowmake && git checkout 7f9023cd
-./install.sh       # the engine image, pinned by digest (ghcr.io/morrowmake/vllm-cmp170hx@sha256:f67d9be4...)
+cd morrowmake && git checkout v1.0.1
+./install.sh       # the engine image, pinned by digest (ghcr.io/morrowmake/vllm-cmp170hx@sha256:32ae8b0e...)
 ./download.sh      # the EXL3 export @ c178a012 and the official checkpoint @ 1bae0e10, then the hybrid
 ```
 
@@ -86,7 +86,7 @@ Run the GPU unit test before the first start. It needs about 1 GiB on one card, 
 IMG=$(grep -oP '^RELEASE_IMAGE=\K.*' start.sh)
 M=(); for f in ops/sm80_kv_pack.py ops/sm80_attn_core.py ops/sm80_attn_pipeline.py ops/sm80_sparse_attn.py \
               ops/sm80_attn_fused.py ops/sm80_index_scores.py sm80_attention.py; do
-  M+=(-v "$PWD/kvc-overlay/vllm/models/deepseek_v41/nvidia/$f:/opt/vllm-src/vllm/models/deepseek_v41/nvidia/$f:ro"); done
+  M+=(-v "$PWD/kvc-overlay/vllm_sm80/models/deepseek_v41/$f:/opt/assembly/plugin/vllm_sm80/models/deepseek_v41/$f:ro"); done
 docker run --rm --gpus all -e CUDA_VISIBLE_DEVICES=0 "${M[@]}" \
   -v /path/to/this-repo/morrowmake/compact-kv/tests:/t:ro --entrypoint /opt/venv/bin/python "$IMG" /t/test_gpu.py
 ```
@@ -101,13 +101,14 @@ listen address, the served name and the API key) and set your own `API_KEY`. The
 
 ```bash
 cp /path/to/this-repo/morrowmake/start-*.sh .
-./start-dspark.sh                                   # what we serve: DSpark on, KV pool ~1.36 M tokens
-./start-nospec.sh                                   # no DSpark: KV pool ~3.19 M tokens
+./start-dspark.sh                                   # what we serve: DSpark on, KV pool ~1.47 M tokens
+./start-nospec.sh                                   # no DSpark: KV pool ~3.09 M tokens
 MORE_ARGS="--max-model-len 1048576" ./start-nospec.sh   # contexts up to 1M (results.md, section 5)
 ```
 
-At start, `logs/serve.log` must report `GPU KV cache size: 1,360,109 tokens` (DSpark) or `3,189,000 tokens`
-(no DSpark), and the boot check must pass. Without the compact cache the graft gives 1,604,950 tokens.
+At start, `logs/serve.log` must report `GPU KV cache size: 1,466,159 tokens` (DSpark) or `3,090,900 tokens`
+(no DSpark), and the boot check must pass. Without the compact cache and without DSpark, the graft gives 1,555,036
+tokens.
 
 **Keep the memory setting at 0.95**, Morrowmake's default. At 0.98 our server ran out of memory on ordinary
 requests.
@@ -131,4 +132,5 @@ The expected result of the compact cache against BF16 rows is `0 differ` on ever
 
 - Morrowmake publishes the API on `127.0.0.1` by default. `env.example` sets `HOST=0.0.0.0` with an
   `API_KEY`: every `/v1` request then needs `Authorization: Bearer <key>`; `/health` stays open.
-- Morrowmake's engine (its vLLM fork) is Apache-2.0, and so are the patched files of `compact-kv/`.
+- Morrowmake's engine (its vLLM fork and the `vllm_sm80` plugin) is Apache-2.0, and so are the patched files of
+  `compact-kv/`.
